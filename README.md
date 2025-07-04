@@ -49,3 +49,19 @@ O projeto não exige variáveis de ambiente obrigatórias, mas algumas opções 
 - `PORT` pode definir a porta do servidor caso utilize o comando `flask run`.
 - A constante `DEBUG_REQUESTS` em `app.py` habilita logs detalhados (por padrão vem ativada).
 
+
+Aplicação Flask que exibe os dados de RTP de jogos em tempo real.
+
+## Verificação SSL
+Por padrão, as requisições HTTPS verificam o certificado do servidor. Para manter a segurança, **não desative** essa verificação em ambientes de produção.
+
+Se for necessário desabilitar temporariamente:
+
+```bash
+VERIFY_SSL=false python app.py
+# ou
+python app.py --insecure
+```
+
+Utilize essa opção apenas em cenários de desenvolvimento ou testes.
+

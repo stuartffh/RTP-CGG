@@ -13,13 +13,20 @@
         <h1 class="mb-4">🎰 RTP dos Jogos - Tempo Real</h1>
 
         <div class="controls mb-4">
+            <input id="search-input" type="text" class="form-control mb-3" placeholder="Pesquisar por nome">
             <button class="btn btn-success" onclick="sortBy('rtp')">🔼 Ordenar por RTP</button>
             <button class="btn btn-info" onclick="sortBy('name')">🔤 Ordenar por Nome</button>
             <button class="btn btn-warning" onclick="fetchGames()">🔄 Atualizar Agora</button>
         </div>
 
         <div id="status-message" class="alert alert-danger d-none mt-3" role="alert"></div>
+        <div id="loading-spinner" class="d-none my-3">
+            <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
         <div id="games-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4"></div>
+        <div id="copy-toast" aria-live="polite"></div>
     </div>
 </body>
 </html>
