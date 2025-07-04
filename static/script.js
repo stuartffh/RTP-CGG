@@ -24,7 +24,7 @@ function displayGames(games) {
         container.innerHTML += `
             <div class="col game-card">
                 <div class="card bg-dark text-white h-100">
-                    <img src="${imgUrl}" class="card-img-top game-img img-fluid">
+                    <img src="${imgUrl}" class="card-img-top game-img img-fluid" alt="Imagem de ${game.name}">
                     <div class="card-body text-center">
                         <h5 class="card-title">${game.name}</h5>
                         <p class="card-text mb-1">Provedor: ${game.provider.name}</p>
