@@ -128,6 +128,36 @@ document.addEventListener('DOMContentLoaded', () => {
 setInterval(fetchGames, 5000);
 fetchGames();
 
+async function generateRecommendations() {
+    const container = document.getElementById('recommendations-container');
+    if (container) container.textContent = 'Gerando recomendações...';
+    try {
+        const response = await fetch('/api/recommendations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(gamesData)
+        });
+        if (!response.ok) throw new Error('Request failed');
+        const data = await response.json();
+        displayRecommendations(data.recomendacoes || []);
+    } catch (err) {
+        console.error('Erro ao gerar recomendações:', err);
+        if (container) container.textContent = 'Falha ao gerar recomendações';
+    }
+}
+
+function displayRecommendations(list) {
+    const container = document.getElementById('recommendations-container');
+    if (!container) return;
+    container.innerHTML = '<h3 class="mb-3">Recomendações</h3>';
+    list.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'mb-2';
+        div.innerHTML = `<strong>${item.nome}</strong> - ${item.prioridade} <br><small>${item.motivo}</small>`;
+        container.appendChild(div);
+    });
+}
+
 document.addEventListener('click', async (e) => {
     if (e.target.classList.contains('card-title')) {
         const text = e.target.textContent.trim();

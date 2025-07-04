@@ -59,3 +59,7 @@ body {
 #copy-toast.show {
     opacity: 1;
 }
+
+#recommendations-container {
+    text-align: left;
+}
