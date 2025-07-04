@@ -1,8 +1,6 @@
 let gamesData = [];
 let currentSort = null;
 let toastTimeout;
-let recInterval;
-let recommendationsModal;
 
 // Mostra toast de feedback
 function showToast(message) {
@@ -25,6 +23,7 @@ async function fetchGames() {
         if (!response.ok) throw new Error('Erro na resposta da rede');
 
         gamesData = await response.json();
+        populateProviders();
 
         if (currentSort) {
             sortBy(currentSort);
@@ -80,6 +79,23 @@ function displayGames(games) {
     });
 }
 
+function populateProviders() {
+    const select = document.getElementById('provider-select');
+    if (!select) return;
+    const providers = [...new Set(gamesData.map(g => g.provider.name))].sort();
+    const current = select.value;
+    select.innerHTML = '<option value="all">Todos os provedores</option>';
+    providers.forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p;
+        opt.textContent = p;
+        select.appendChild(opt);
+    });
+    if ([...select.options].some(o => o.value === current)) {
+        select.value = current;
+    }
+}
+
 // Ordena jogos
 function sortBy(criteria) {
     currentSort = criteria;
@@ -103,80 +119,31 @@ function debounce(fn, delay) {
 // Filtra e exibe jogos
 function filterAndRender() {
     const query = document.getElementById('search-input')?.value.trim().toLowerCase() || '';
-    let filtered = gamesData;
-    if (query) {
-        filtered = gamesData.filter(game => game.name.toLowerCase().includes(query));
-    }
+    const provider = document.getElementById('provider-select')?.value || 'all';
+    const showPos = document.getElementById('show-positive')?.checked ?? true;
+    const showNeg = document.getElementById('show-negative')?.checked ?? true;
+    const minRtp = parseFloat(document.getElementById('min-rtp')?.value) || null;
+    const maxRtp = parseFloat(document.getElementById('max-rtp')?.value) || null;
+
+    let filtered = gamesData.filter(game => {
+        if (query && !game.name.toLowerCase().includes(query)) return false;
+        if (provider !== 'all' && game.provider.name !== provider) return false;
+        if (game.rtp_status === 'up' && !showPos) return false;
+        if (game.rtp_status === 'down' && !showNeg) return false;
+        const rtpValue = game.rtp / 100;
+        if (minRtp !== null && rtpValue < minRtp) return false;
+        if (maxRtp !== null && rtpValue > maxRtp) return false;
+        return true;
+    });
 
     displayGames(filtered);
 }
 
 const handleSearchInput = debounce(filterAndRender, 300);
 
-// Gera recomendações com IA
-async function generateRecommendations(auto = false) {
-    const modalEl = document.getElementById('recommendationsModal');
-    if (modalEl && !recommendationsModal) {
-        recommendationsModal = new bootstrap.Modal(modalEl);
-        modalEl.addEventListener('hidden.bs.modal', () => clearInterval(recInterval));
-        document.getElementById('minimize-modal').addEventListener('click', () => {
-            modalEl.querySelector('.modal-dialog').classList.toggle('minimized');
-        });
-    }
-
-    const container = document.getElementById('recommendations-container');
-    if (container) container.textContent = 'Gerando recomendações...';
-
-    try {
-        const response = await fetch('/api/recommendations', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(gamesData)
-        });
-        if (!response.ok) throw new Error('Request failed');
-        const data = await response.json();
-        displayRecommendations(data.recomendacoes || []);
-        if (!auto && recommendationsModal) {
-            recommendationsModal.show();
-            startRecommendationsUpdates();
-        }
-    } catch (err) {
-        console.error('Erro ao gerar recomendações:', err);
-        if (container) container.textContent = 'Falha ao gerar recomendações.';
-    }
-}
-
-// Atualizações automáticas de recomendações
-function startRecommendationsUpdates() {
-    if (recInterval) clearInterval(recInterval);
-    recInterval = setInterval(() => generateRecommendations(true), 30000);
-}
-
-// Exibe recomendações no modal
-function displayRecommendations(list) {
-    const container = document.getElementById('recommendations-container');
-    if (!container) return;
-    container.innerHTML = '<h3 class="mb-3">Recomendações</h3>';
-
-    if (!list.length) {
-        container.innerHTML += "<p>Nenhuma recomendação disponível.</p>";
-        return;
-    }
-
-    list.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'mb-2';
-        const rtp = item.rtp ? `${parseFloat(item.rtp).toFixed(2)}%` : '';
-        div.innerHTML = `
-            <strong class="rec-name" title="Clique para copiar">${item.nome}</strong> - ${item.prioridade} ${rtp}
-            <br><small>${item.motivo}</small>`;
-        container.appendChild(div);
-    });
-}
-
 // Copiar nome ao clicar
 document.addEventListener('click', async (e) => {
-    if (e.target.classList.contains('card-title') || e.target.classList.contains('rec-name')) {
+    if (e.target.classList.contains('card-title')) {
         const text = e.target.textContent.trim();
         try {
             await navigator.clipboard.writeText(text);
@@ -191,9 +158,12 @@ document.addEventListener('click', async (e) => {
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('input', handleSearchInput);
-    }
+    if (searchInput) searchInput.addEventListener('input', handleSearchInput);
+    document.getElementById('provider-select')?.addEventListener('change', filterAndRender);
+    document.getElementById('show-positive')?.addEventListener('change', filterAndRender);
+    document.getElementById('show-negative')?.addEventListener('change', filterAndRender);
+    document.getElementById('min-rtp')?.addEventListener('input', debounce(filterAndRender, 300));
+    document.getElementById('max-rtp')?.addEventListener('input', debounce(filterAndRender, 300));
     fetchGames();
     setInterval(fetchGames, 5000);
 });

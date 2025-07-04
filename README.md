@@ -51,15 +51,8 @@ O projeto não exige variáveis de ambiente obrigatórias, mas algumas opções 
 - `PORT` pode definir a porta do servidor caso utilize o comando `flask run`.
 - Defina `DEBUG_REQUESTS=true` para registrar detalhes das chamadas HTTP.
 - A variável `FLASK_DEBUG` controla o modo debug do Flask.
-- `OPENAI_API_KEY` chave de acesso à API da OpenAI para geração de recomendações.
-
 
 Aplicação Flask que exibe os dados de RTP de jogos em tempo real.
-
-## Recomendações com OpenAI
-
-Defina a variável `OPENAI_API_KEY` com a sua chave da OpenAI para habilitar o endpoint `/api/recommendations`.
-No painel, clique em **Gerar Recomendações** para obter sugestões de jogos com maior potencial de pagamento.
 
 ## Verificação SSL
 Por padrão, as requisições HTTPS verificam o certificado do servidor. Para manter a segurança, **não desative** essa verificação em ambientes de produção.
