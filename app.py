@@ -1,6 +1,5 @@
 from flask import Flask, render_template, jsonify
 import os
-import argparse
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import requests
@@ -11,24 +10,12 @@ from google.protobuf.message_factory import MessageFactory
 
 app = Flask(__name__)
 
-DEBUG_REQUESTS = True  # Altere para False para desativar logs detalhados
+DEBUG_REQUESTS = True
 
-# Controle de verificação SSL via flag ou variável de ambiente
-parser = argparse.ArgumentParser(add_help=False)
-parser.add_argument('--insecure', action='store_true', help='Desativa verificação SSL (não recomendado)')
-args, _ = parser.parse_known_args()
-VERIFY_SSL = os.environ.get('VERIFY_SSL', 'false').lower() not in ('false', '0', 'no')
-if args.insecure:
-    VERIFY_SSL = False
+VERIFY_SSL = True
 
 url = "https://cgg.bet.br/casinogo/widgets/v2/live-rtp"
-headers = {
-    'accept': 'application/x-protobuf',
-    'content-type': 'application/x-protobuf',
-    'x-language-iso': 'pt-BR',
-    'origin': 'https://cgg.bet.br',
-    'referer': 'https://cgg.bet.br/pt-BR/casinos/casino/lobby'
-}
+headers = {...}
 data = b'\x08\x01\x10\x02'
 
 def get_protobuf_message():
@@ -107,4 +94,12 @@ def games():
     return jsonify(games)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    import argparse
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument('--insecure', action='store_true', help='Desativa verificação SSL')
+    args, _ = parser.parse_known_args()
+    VERIFY_SSL = os.environ.get('VERIFY_SSL', 'false').lower() not in ('false', '0', 'no')
+    if args.insecure:
+        VERIFY_SSL = False
+
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
