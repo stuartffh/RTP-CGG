@@ -1,5 +1,15 @@
 let gamesData = [];
 let currentSort = null;
+let toastTimeout;
+
+function showToast(message) {
+    const toast = document.getElementById('copy-toast');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => toast.classList.remove('show'), 1500);
+}
 
 async function fetchGames() {
     const spinner = document.getElementById('loading-spinner');
@@ -32,6 +42,7 @@ async function fetchGames() {
     } finally {
         if (spinner) spinner.classList.add('d-none');
     }
+    }
 }
 
 function displayGames(games) {
@@ -54,7 +65,7 @@ function displayGames(games) {
                 <div class="card bg-dark text-white h-100">
                     <img src="${imgUrl}" class="card-img-top game-img img-fluid" alt="Imagem de ${game.name}">
                     <div class="card-body text-center">
-                        <h5 class="card-title">${game.name}</h5>
+                        <h5 class="card-title" title="Clique para copiar">${game.name}</h5>
                         <p class="card-text mb-1">Provedor: ${game.provider.name}</p>
                         <p class="card-text">
                             RTP: <strong>${(game.rtp/100).toFixed(2)}%</strong> ${statusBadge}
@@ -78,3 +89,16 @@ function sortBy(criteria) {
 // Atualização automática a cada 2 segundos
 setInterval(fetchGames, 2000);
 fetchGames();
+
+document.addEventListener('click', async (e) => {
+    if (e.target.classList.contains('card-title')) {
+        const text = e.target.textContent.trim();
+        try {
+            await navigator.clipboard.writeText(text);
+            showToast('Nome copiado!');
+        } catch (err) {
+            console.error('Erro ao copiar nome:', err);
+            showToast('Falha ao copiar');
+        }
+    }
+});
