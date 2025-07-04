@@ -1,9 +1,14 @@
 let gamesData = [];
+let currentSort = null;
 
 async function fetchGames() {
-    const response = await fetch('/api/games');
+    const response = await fetch("/api/games");
     gamesData = await response.json();
-    displayGames(gamesData);
+    if (currentSort) {
+        sortBy(currentSort);
+    } else {
+        displayGames(gamesData);
+    }
 }
 
 function displayGames(games) {
@@ -38,6 +43,7 @@ function displayGames(games) {
 }
 
 function sortBy(criteria) {
+    currentSort = criteria;
     if (criteria === 'rtp') {
         gamesData.sort((a, b) => b.rtp - a.rtp);
     } else if (criteria === 'name') {
