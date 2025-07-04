@@ -12,7 +12,8 @@ app = Flask(__name__)
 
 DEBUG_REQUESTS = True
 
-VERIFY_SSL = True
+# Permite personalizar a verificação SSL via variável de ambiente
+VERIFY_SSL = os.environ.get('VERIFY_SSL', 'true').lower() not in ('false', '0', 'no')
 
 url = "https://cgg.bet.br/casinogo/widgets/v2/live-rtp"
 headers = {...}
@@ -98,7 +99,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--insecure', action='store_true', help='Desativa verificação SSL')
     args, _ = parser.parse_known_args()
-    VERIFY_SSL = os.environ.get('VERIFY_SSL', 'false').lower() not in ('false', '0', 'no')
     if args.insecure:
         VERIFY_SSL = False
 
