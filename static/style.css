@@ -1,36 +1,91 @@
 body {
     padding: 20px;
-    background-color: #121212;
+    background: linear-gradient(135deg, #121212, #1f1f1f);
     color: #fff;
-}
-
-.game-card {
-    margin-bottom: 20px;
-}
-
-.rtp-badge {
-    font-size: 0.9em;
-}
-
-/* Imagem responsiva e proporcional */
-.game-img {
+  }
+  
+  .controls {
+    margin-bottom: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+    text-align: left;
+  }
+  
+  .controls .form-control,
+  .controls .form-select {
+    width: auto;
+    min-width: 120px;
+  }
+  
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+  
+  .game-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 6px solid transparent;
+  }
+  
+  .game-card[data-status="up"] {
+    border-left-color: #28a745;
+  }
+  
+  .game-card[data-status="down"] {
+    border-left-color: #dc3545;
+  }
+  
+  .game-card[data-status="neutral"] {
+    border-left-color: #6c757d;
+  }
+  
+  .game-card:hover .card {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.8);
+    border: 1px solid #444;
+  }
+  
+  .card {
+    border: none;
+    border-radius: 12px;
+    background-color: #1f1f1f;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  }
+  
+  .card-title {
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #fff;
+  }
+  
+  .rtp-badge {
+    font-size: 0.85em;
+  }
+  
+  .game-img {
     width: 100%;
     height: auto;
     object-fit: contain;
     margin: 0 auto;
     display: block;
-    max-height: 360px; /* altura máxima ajustável */
-}
-
-@media (max-width: 768px) {
+    max-height: 200px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  @media (max-width: 768px) {
     .game-img {
-        max-height: 140px;
+      max-height: 140px;
     }
-}
-
-@media (max-width: 576px) {
+  }
+  
+  @media (max-width: 576px) {
     .game-img {
-        max-height: 120px;
+      max-height: 120px;
     }
 }
 
@@ -72,6 +127,9 @@ body {
 }
 
 #copy-toast {
+  }
+  
+  #copy-toast {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -83,9 +141,9 @@ body {
     transition: opacity 0.3s ease;
     pointer-events: none;
     z-index: 1055;
-}
-
-#copy-toast.show {
+  }
+  
+  #copy-toast.show {
     opacity: 1;
-}
-
+  }
+  
