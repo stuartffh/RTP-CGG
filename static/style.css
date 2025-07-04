@@ -1,0 +1,21 @@
+body {
+    padding: 20px;
+    background-color: #121212;
+    color: #fff;
+}
+.game-card {
+    margin-bottom: 20px;
+}
+.rtp-badge {
+    font-size: 0.9em;
+}
+.game-img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    margin: 0 auto;
+    display: block;
+}
+.controls {
+    margin-bottom: 25px;
+}
