@@ -128,9 +128,22 @@ document.addEventListener('DOMContentLoaded', () => {
 setInterval(fetchGames, 5000);
 fetchGames();
 
-async function generateRecommendations() {
+let recInterval;
+let recommendationsModal;
+
+async function generateRecommendations(auto = false) {
+    const modalEl = document.getElementById('recommendationsModal');
+    if (modalEl && !recommendationsModal) {
+        recommendationsModal = new bootstrap.Modal(modalEl);
+        modalEl.addEventListener('hidden.bs.modal', () => clearInterval(recInterval));
+        document.getElementById('minimize-modal').addEventListener('click', () => {
+            modalEl.querySelector('.modal-dialog').classList.toggle('minimized');
+        });
+    }
+
     const container = document.getElementById('recommendations-container');
     if (container) container.textContent = 'Gerando recomendações...';
+
     try {
         const response = await fetch('/api/recommendations', {
             method: 'POST',
@@ -140,10 +153,19 @@ async function generateRecommendations() {
         if (!response.ok) throw new Error('Request failed');
         const data = await response.json();
         displayRecommendations(data.recomendacoes || []);
+        if (!auto && recommendationsModal) {
+            recommendationsModal.show();
+            startRecommendationsUpdates();
+        }
     } catch (err) {
         console.error('Erro ao gerar recomendações:', err);
         if (container) container.textContent = 'Falha ao gerar recomendações';
     }
+}
+
+function startRecommendationsUpdates() {
+    if (recInterval) clearInterval(recInterval);
+    recInterval = setInterval(() => generateRecommendations(true), 30000);
 }
 
 function displayRecommendations(list) {
@@ -153,13 +175,14 @@ function displayRecommendations(list) {
     list.forEach(item => {
         const div = document.createElement('div');
         div.className = 'mb-2';
-        div.innerHTML = `<strong>${item.nome}</strong> - ${item.prioridade} <br><small>${item.motivo}</small>`;
+        const rtp = item.rtp ? `${parseFloat(item.rtp).toFixed(2)}%` : '';
+        div.innerHTML = `<strong class="rec-name" title="Clique para copiar">${item.nome}</strong> - ${item.prioridade} ${rtp} <br><small>${item.motivo}</small>`;
         container.appendChild(div);
     });
 }
 
 document.addEventListener('click', async (e) => {
-    if (e.target.classList.contains('card-title')) {
+    if (e.target.classList.contains('card-title') || e.target.classList.contains('rec-name')) {
         const text = e.target.textContent.trim();
         try {
             await navigator.clipboard.writeText(text);

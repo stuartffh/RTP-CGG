@@ -63,3 +63,14 @@ body {
 #recommendations-container {
     text-align: left;
 }
+
+.resizable-modal {
+    max-width: none;
+    resize: both;
+    overflow: auto;
+}
+
+.resizable-modal.minimized {
+    height: 40px !important;
+    overflow: hidden;
+}
