@@ -2,6 +2,29 @@ let gamesData = [];
 let currentSort = null;
 
 async function fetchGames() {
+    try {
+        const response = await fetch('/api/games');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        gamesData = await response.json();
+        displayGames(gamesData);
+
+        const statusEl = document.getElementById('status-message');
+        if (statusEl) {
+            statusEl.classList.add('d-none');
+            statusEl.textContent = '';
+        }
+    } catch (error) {
+        console.error('Erro ao buscar os jogos:', error);
+        const statusEl = document.getElementById('status-message');
+        const message = 'Não foi possível carregar os jogos. Tente novamente mais tarde.';
+        if (statusEl) {
+            statusEl.textContent = message;
+            statusEl.classList.remove('d-none');
+        } else {
+            alert(message);
+        }
     const response = await fetch("/api/games");
     gamesData = await response.json();
     if (currentSort) {
