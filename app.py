@@ -1,11 +1,8 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify
 import os
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import requests
-import openai
-import json
-import re
 from google.protobuf.json_format import MessageToDict
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 from google.protobuf.descriptor_pool import DescriptorPool
@@ -104,49 +101,6 @@ def games():
     return jsonify(games)
 
 
-@app.route('/api/recommendations', methods=['POST'])
-def recommendations():
-    api_key = os.environ.get('OPENAI_API_KEY')
-    if not api_key:
-        return jsonify({'error': 'OPENAI_API_KEY not configured'}), 500
-
-    payload = request.get_json(silent=True)
-    if not isinstance(payload, list):
-        return jsonify({'error': 'Invalid payload'}), 400
-
-    openai.api_key = api_key
-    prompt = (
-        "Analise a lista de jogos a seguir e indique aqueles com maior potencial de pagamento. "
-        "Baseie-se no campo 'rtp' e no status 'rtp_status' (up, down ou neutral). "
-        "Responda SOMENTE com JSON PURO no formato: "
-        "{\"recomendacoes\":[{\"nome\":\"\",\"rtp\":0.0,\"prioridade\":\"Alta|Média|Baixa\",\"motivo\":\"\"}]}"
-    )
-
-    try:
-        completion = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": f"{json.dumps(payload, ensure_ascii=False)}"}
-            ],
-            temperature=0.2,
-        )
-        content = completion.choices[0].message.content.strip()
-
-        # Extrai só o JSON da resposta
-        json_match = re.search(r"({.*})", content, re.DOTALL)
-        if not json_match:
-            raise ValueError("A resposta do modelo não continha JSON válido.")
-        data = json.loads(json_match.group(1))
-
-        # Se não vier recomendacoes, força uma lista vazia
-        if "recomendacoes" not in data:
-            data["recomendacoes"] = []
-
-        return jsonify(data)
-
-    except Exception as exc:
-        return jsonify({'error': str(exc)}), 500
 
 
 if __name__ == '__main__':
