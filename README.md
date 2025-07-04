@@ -29,11 +29,13 @@ Aplicação Flask que consulta o endpoint `https://cgg.bet.br` e exibe em tempo 
    ```bash
    docker build -t rtp-cgg .
    ```
-2. Execute o container na porta 5000:
+2. Execute o container informando a porta desejada (padrão `5000`):
    ```bash
-   docker run -p 5000:5000 rtp-cgg
+   docker run -e PORT=5000 -p 5000:5000 rtp-cgg
    ```
 3. Acesse `http://localhost:5000` para visualizar o dashboard.
+
+Esse mesmo Dockerfile funciona em plataformas como o **EasyPanel**, bastando informar a variável `PORT` caso a hospedagem utilize outra porta padrão.
 
 ## Scripts disponíveis
 
