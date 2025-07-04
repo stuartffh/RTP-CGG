@@ -5,6 +5,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import requests
 import openai
 import json
+import re
 from google.protobuf.json_format import MessageToDict
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 from google.protobuf.descriptor_pool import DescriptorPool
@@ -12,7 +13,7 @@ from google.protobuf import message_factory
 
 app = Flask(__name__)
 
-DEBUG_REQUESTS = True
+DEBUG_REQUESTS = os.environ.get('DEBUG_REQUESTS', 'false').lower() in ('1', 'true', 'yes')
 
 # Permite personalizar a verificação SSL via variável de ambiente
 VERIFY_SSL = os.environ.get('VERIFY_SSL', 'false').lower() not in ('false', '0', 'no')
@@ -131,7 +132,13 @@ def recommendations():
             temperature=0.2,
         )
         content = completion.choices[0].message.content
-        data = json.loads(content)
+        try:
+            data = json.loads(content)
+        except json.JSONDecodeError:
+            match = re.search(r"({.*})", content, re.DOTALL)
+            if not match:
+                raise ValueError("Invalid response format")
+            data = json.loads(match.group(1))
         return jsonify(data)
     except Exception as exc:
         return jsonify({'error': str(exc)}), 500
@@ -144,4 +151,5 @@ if __name__ == '__main__':
     if args.insecure:
         VERIFY_SSL = False
 
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=True)
+    debug_mode = os.environ.get('FLASK_DEBUG', 'false').lower() in ('1', 'true', 'yes')
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=debug_mode)

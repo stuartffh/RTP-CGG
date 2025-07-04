@@ -49,7 +49,8 @@ O projeto não exige variáveis de ambiente obrigatórias, mas algumas opções 
 
 - `FLASK_APP` e `FLASK_ENV` podem ser usados ao executar via `flask run`.
 - `PORT` pode definir a porta do servidor caso utilize o comando `flask run`.
-- A constante `DEBUG_REQUESTS` em `app.py` habilita logs detalhados (por padrão vem ativada).
+- Defina `DEBUG_REQUESTS=true` para registrar detalhes das chamadas HTTP.
+- A variável `FLASK_DEBUG` controla o modo debug do Flask.
 - `OPENAI_API_KEY` chave de acesso à API da OpenAI para geração de recomendações.
 
 
