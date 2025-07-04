@@ -1,4 +1,6 @@
 from flask import Flask, render_template, jsonify
+import os
+import argparse
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import requests
@@ -10,6 +12,14 @@ from google.protobuf.message_factory import MessageFactory
 app = Flask(__name__)
 
 DEBUG_REQUESTS = True  # Altere para False para desativar logs detalhados
+
+# Controle de verificação SSL via flag ou variável de ambiente
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('--insecure', action='store_true', help='Desativa verificação SSL (não recomendado)')
+args, _ = parser.parse_known_args()
+VERIFY_SSL = os.environ.get('VERIFY_SSL', 'true').lower() not in ('false', '0', 'no')
+if args.insecure:
+    VERIFY_SSL = False
 
 url = "https://cgg.bet.br/casinogo/widgets/v2/live-rtp"
 headers = {
@@ -69,8 +79,9 @@ def games():
         print(f"[DEBUG] URL: {url}")
         print(f"[DEBUG] Headers: {headers}")
         print(f"[DEBUG] Data (bytes): {data}")
+        print(f"[DEBUG] SSL Verify: {VERIFY_SSL}")
 
-    response = requests.post(url, headers=headers, data=data, verify=False)
+    response = requests.post(url, headers=headers, data=data, verify=VERIFY_SSL)
 
     if DEBUG_REQUESTS:
         print("\n[DEBUG] <<< Recebendo Resposta >>>")
