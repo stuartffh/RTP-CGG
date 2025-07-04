@@ -1,7 +1,10 @@
 let gamesData = [];
 let currentSort = null;
 let toastTimeout;
+let recInterval;
+let recommendationsModal;
 
+// Mostra toast de feedback
 function showToast(message) {
     const toast = document.getElementById('copy-toast');
     if (!toast) return;
@@ -11,32 +14,31 @@ function showToast(message) {
     toastTimeout = setTimeout(() => toast.classList.remove('show'), 1500);
 }
 
+// Busca lista de jogos do backend
 async function fetchGames() {
     const spinner = document.getElementById('loading-spinner');
     const statusEl = document.getElementById('status-message');
+
     try {
         if (spinner) spinner.classList.remove('d-none');
         const response = await fetch('/api/games');
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
+        if (!response.ok) throw new Error('Erro na resposta da rede');
+
         gamesData = await response.json();
 
-        const statusEl = document.getElementById('status-message');
         if (currentSort) {
             sortBy(currentSort);
         } else {
-            displayGames(gamesData);
+            filterAndRender();
         }
+
         if (statusEl) {
             statusEl.classList.add('d-none');
             statusEl.textContent = '';
         }
-
-        filterAndRender();
     } catch (error) {
-        console.error('Erro ao buscar os jogos:', error);
-        const message = 'Não foi possível carregar os jogos. Tente novamente mais tarde.';
+        console.error('Erro ao buscar jogos:', error);
+        const message = 'Não foi possível carregar os jogos. Tente novamente.';
         if (statusEl) {
             statusEl.textContent = message;
             statusEl.classList.remove('d-none');
@@ -46,17 +48,15 @@ async function fetchGames() {
     } finally {
         if (spinner) spinner.classList.add('d-none');
     }
-    
 }
 
+// Exibe os jogos na tela
 function displayGames(games) {
     const container = document.getElementById('games-container');
     container.innerHTML = '';
 
     games.forEach(game => {
-        const gameId = game.id;
-        const imgUrl = `https://cgg.bet.br/static/v1/casino/game/0/${gameId}/big.webp`;
-
+        const imgUrl = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
         const rtpStatus = game.rtp_status || 'neutral';
         const statusBadge = {
             down: '<span class="badge bg-danger rtp-badge">▼ RTP Baixo</span>',
@@ -80,18 +80,18 @@ function displayGames(games) {
     });
 }
 
-function sortBy(criteria, skipRender = false) {
+// Ordena jogos
+function sortBy(criteria) {
     currentSort = criteria;
     if (criteria === 'rtp') {
         gamesData.sort((a, b) => b.rtp - a.rtp);
     } else if (criteria === 'name') {
         gamesData.sort((a, b) => a.name.localeCompare(b.name));
     }
-    if (!skipRender) {
-        filterAndRender();
-    }
+    filterAndRender();
 }
 
+// Debounce de pesquisa
 function debounce(fn, delay) {
     let timeout;
     return (...args) => {
@@ -100,6 +100,7 @@ function debounce(fn, delay) {
     };
 }
 
+// Filtra e exibe jogos
 function filterAndRender() {
     const query = document.getElementById('search-input')?.value.trim().toLowerCase() || '';
     let filtered = gamesData;
@@ -107,30 +108,12 @@ function filterAndRender() {
         filtered = gamesData.filter(game => game.name.toLowerCase().includes(query));
     }
 
-    if (currentSort === 'rtp') {
-        filtered = [...filtered].sort((a, b) => b.rtp - a.rtp);
-    } else if (currentSort === 'name') {
-        filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
-    }
-
     displayGames(filtered);
 }
 
 const handleSearchInput = debounce(filterAndRender, 300);
 
-document.addEventListener('DOMContentLoaded', () => {
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        searchInput.addEventListener('input', handleSearchInput);
-    }
-});
-
-setInterval(fetchGames, 5000);
-fetchGames();
-
-let recInterval;
-let recommendationsModal;
-
+// Gera recomendações com IA
 async function generateRecommendations(auto = false) {
     const modalEl = document.getElementById('recommendationsModal');
     if (modalEl && !recommendationsModal) {
@@ -159,28 +142,39 @@ async function generateRecommendations(auto = false) {
         }
     } catch (err) {
         console.error('Erro ao gerar recomendações:', err);
-        if (container) container.textContent = 'Falha ao gerar recomendações';
+        if (container) container.textContent = 'Falha ao gerar recomendações.';
     }
 }
 
+// Atualizações automáticas de recomendações
 function startRecommendationsUpdates() {
     if (recInterval) clearInterval(recInterval);
     recInterval = setInterval(() => generateRecommendations(true), 30000);
 }
 
+// Exibe recomendações no modal
 function displayRecommendations(list) {
     const container = document.getElementById('recommendations-container');
     if (!container) return;
     container.innerHTML = '<h3 class="mb-3">Recomendações</h3>';
+
+    if (!list.length) {
+        container.innerHTML += "<p>Nenhuma recomendação disponível.</p>";
+        return;
+    }
+
     list.forEach(item => {
         const div = document.createElement('div');
         div.className = 'mb-2';
         const rtp = item.rtp ? `${parseFloat(item.rtp).toFixed(2)}%` : '';
-        div.innerHTML = `<strong class="rec-name" title="Clique para copiar">${item.nome}</strong> - ${item.prioridade} ${rtp} <br><small>${item.motivo}</small>`;
+        div.innerHTML = `
+            <strong class="rec-name" title="Clique para copiar">${item.nome}</strong> - ${item.prioridade} ${rtp}
+            <br><small>${item.motivo}</small>`;
         container.appendChild(div);
     });
 }
 
+// Copiar nome ao clicar
 document.addEventListener('click', async (e) => {
     if (e.target.classList.contains('card-title') || e.target.classList.contains('rec-name')) {
         const text = e.target.textContent.trim();
@@ -192,4 +186,14 @@ document.addEventListener('click', async (e) => {
             showToast('Falha ao copiar');
         }
     }
+});
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', handleSearchInput);
+    }
+    fetchGames();
+    setInterval(fetchGames, 5000);
 });
