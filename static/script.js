@@ -21,6 +21,8 @@ async function fetchGames() {
             throw new Error('Network response was not ok');
         }
         gamesData = await response.json();
+
+        const statusEl = document.getElementById('status-message');
         if (currentSort) {
             sortBy(currentSort);
         } else {
@@ -30,6 +32,8 @@ async function fetchGames() {
             statusEl.classList.add('d-none');
             statusEl.textContent = '';
         }
+
+        filterAndRender();
     } catch (error) {
         console.error('Erro ao buscar os jogos:', error);
         const message = 'Não foi possível carregar os jogos. Tente novamente mais tarde.';
@@ -55,9 +59,9 @@ function displayGames(games) {
 
         const rtpStatus = game.rtp_status || 'neutral';
         const statusBadge = {
-            'down': '<span class="badge bg-danger rtp-badge">▼ RTP Baixo</span>',
-            'up': '<span class="badge bg-success rtp-badge">▲ RTP Alto</span>',
-            'neutral': '<span class="badge bg-secondary rtp-badge">▬ Neutro</span>'
+            down: '<span class="badge bg-danger rtp-badge">▼ RTP Baixo</span>',
+            up: '<span class="badge bg-success rtp-badge">▲ RTP Alto</span>',
+            neutral: '<span class="badge bg-secondary rtp-badge">▬ Neutro</span>'
         }[rtpStatus];
 
         container.innerHTML += `
@@ -68,7 +72,7 @@ function displayGames(games) {
                         <h5 class="card-title" title="Clique para copiar">${game.name}</h5>
                         <p class="card-text mb-1">Provedor: ${game.provider.name}</p>
                         <p class="card-text">
-                            RTP: <strong>${(game.rtp/100).toFixed(2)}%</strong> ${statusBadge}
+                            RTP: <strong>${(game.rtp / 100).toFixed(2)}%</strong> ${statusBadge}
                         </p>
                     </div>
                 </div>
@@ -76,17 +80,51 @@ function displayGames(games) {
     });
 }
 
-function sortBy(criteria) {
+function sortBy(criteria, skipRender = false) {
     currentSort = criteria;
     if (criteria === 'rtp') {
         gamesData.sort((a, b) => b.rtp - a.rtp);
     } else if (criteria === 'name') {
         gamesData.sort((a, b) => a.name.localeCompare(b.name));
     }
-    displayGames(gamesData);
+    if (!skipRender) {
+        filterAndRender();
+    }
 }
 
-// Atualização automática a cada 2 segundos
+function debounce(fn, delay) {
+    let timeout;
+    return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => fn.apply(null, args), delay);
+    };
+}
+
+function filterAndRender() {
+    const query = document.getElementById('search-input')?.value.trim().toLowerCase() || '';
+    let filtered = gamesData;
+    if (query) {
+        filtered = gamesData.filter(game => game.name.toLowerCase().includes(query));
+    }
+
+    if (currentSort === 'rtp') {
+        filtered = [...filtered].sort((a, b) => b.rtp - a.rtp);
+    } else if (currentSort === 'name') {
+        filtered = [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+    }
+
+    displayGames(filtered);
+}
+
+const handleSearchInput = debounce(filterAndRender, 300);
+
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', handleSearchInput);
+    }
+});
+
 setInterval(fetchGames, 2000);
 fetchGames();
 
