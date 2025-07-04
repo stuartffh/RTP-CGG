@@ -1,0 +1,51 @@
+# RTP-CGG
+
+Aplicação Flask que consulta o endpoint `https://cgg.bet.br` e exibe em tempo real o RTP (Return to Player) dos jogos de cassino.
+
+## Pré-requisitos
+
+- **Python** 3.12 ou superior com `pip` instalado.
+- **Docker** (opcional) para executar a aplicação em container.
+
+## Como executar
+
+### Utilizando Python
+
+1. Crie um ambiente virtual e instale as dependências:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
+2. Inicie o servidor Flask:
+   ```bash
+   python app.py
+   ```
+   O serviço ficará disponível em `http://localhost:5000`.
+
+### Utilizando Docker
+
+1. Construa a imagem:
+   ```bash
+   docker build -t rtp-cgg .
+   ```
+2. Execute o container na porta 5000:
+   ```bash
+   docker run -p 5000:5000 rtp-cgg
+   ```
+3. Acesse `http://localhost:5000` para visualizar o dashboard.
+
+## Scripts disponíveis
+
+- `app.py` – servidor Flask principal.
+- `Dockerfile` – script para criar a imagem Docker.
+- `requirements.txt` – lista de dependências Python.
+
+## Variáveis de ambiente
+
+O projeto não exige variáveis de ambiente obrigatórias, mas algumas opções podem ser configuradas manualmente:
+
+- `FLASK_APP` e `FLASK_ENV` podem ser usados ao executar via `flask run`.
+- `PORT` pode definir a porta do servidor caso utilize o comando `flask run`.
+- A constante `DEBUG_REQUESTS` em `app.py` habilita logs detalhados (por padrão vem ativada).
+
