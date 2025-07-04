@@ -2,6 +2,7 @@ from flask import Flask, render_template, jsonify
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import requests
+import os
 from google.protobuf.json_format import MessageToDict
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 from google.protobuf.descriptor_pool import DescriptorPool
@@ -95,5 +96,9 @@ def games():
 
     return jsonify(games)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+        debug=False
+    )

@@ -87,7 +87,7 @@ function sortBy(criteria) {
 }
 
 // Atualização automática a cada 2 segundos
-setInterval(fetchGames, 2000);
+setInterval(fetchGames, 5000);
 fetchGames();
 
 document.addEventListener('click', async (e) => {
