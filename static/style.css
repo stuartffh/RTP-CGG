@@ -1,118 +1,110 @@
 body {
     padding: 20px;
-    background: linear-gradient(135deg, #121212, #1f1f1f);
-    color: #fff;
-}
-  
-.controls {
-    margin-bottom: 25px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: flex-start;
-    text-align: left;
-}
-
-.controls .form-control,
-.controls .form-select {
-    width: auto;
-    min-width: 120px;
-}
-  
-  .games-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 16px;
+    background: linear-gradient(135deg, #121212, #1e1e1e);
+    color: #f8f9fa;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   }
   
+  /* Sidebar com filtros */
+  .sidebar .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .sidebar .controls input,
+  .sidebar .controls select {
+    background-color: #2c2c2c;
+    color: #f8f9fa;
+    border: 1px solid #444;
+  }
+  
+  .sidebar .controls input::placeholder {
+    color: #aaa;
+  }
+  
+  .sidebar .btn {
+    width: 100%;
+  }
+  
+  .sidebar .form-check-label {
+    font-size: 0.9rem;
+  }
+  
+  /* Grid de cards */
+  #games-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+  
+  /* Card container */
   .game-card {
     transition: transform 0.2s, box-shadow 0.2s;
-    border-left: 6px solid transparent;
+    border-left: 5px solid transparent;
+    border-radius: 8px;
+    overflow: hidden;
   }
   
+  /* Borda colorida por status */
   .game-card[data-status="up"] {
     border-left-color: #28a745;
   }
-  
   .game-card[data-status="down"] {
     border-left-color: #dc3545;
   }
-  
   .game-card[data-status="neutral"] {
     border-left-color: #6c757d;
   }
   
-  .game-card:hover .card {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.8);
-    border: 1px solid #444;
-  }
-  
+  /* Card interno */
   .card {
     border: none;
-    border-radius: 12px;
+    border-radius: 8px;
     background-color: #1f1f1f;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   
+  .game-card:hover .card {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.85);
+  }
+  
+  /* Título do jogo */
   .card-title {
     cursor: pointer;
     font-size: 1.1rem;
     font-weight: 600;
     color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
+  /* Badge RTP */
   .rtp-badge {
     font-size: 0.85em;
   }
   
+  /* Imagem do jogo */
   .game-img {
     width: 100%;
     height: auto;
     object-fit: contain;
     margin: 0 auto;
     display: block;
-    max-height: 200px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    max-height: 180px;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
   }
   
-  @media (max-width: 768px) {
-    .game-img {
-      max-height: 140px;
-    }
+  .game-card:hover .game-img {
+    transform: scale(1.03);
   }
   
-  @media (max-width: 576px) {
-    .game-img {
-      max-height: 120px;
-    }
-}
-
-.sidebar .controls {
-    flex-direction: column;
-    align-items: stretch;
-}
-
-.sidebar .btn {
-    width: 100%;
-}
-
-#games-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
-}
-
-.game-card {
-    margin-bottom: 0;
-}
-
-.card-title {
-    cursor: pointer;
-}
-
-#copy-toast {
+  /* Toast de cópia */
+  #copy-toast {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -124,9 +116,55 @@ body {
     transition: opacity 0.3s ease;
     pointer-events: none;
     z-index: 1055;
-}
-  
-#copy-toast.show {
+  }
+  #copy-toast.show {
     opacity: 1;
-}
+  }
+  
+  /* Spinner */
+  #loading-spinner {
+    text-align: center;
+  }
+  
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .game-img {
+      max-height: 140px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .game-img {
+      max-height: 120px;
+    }
+    .card-title {
+      font-size: 1rem;
+    }
+  }
+  
+  /* Botões com cores sofisticadas */
+  .btn-success {
+    background-color: #28a745;
+    border: none;
+  }
+  .btn-success:hover {
+    background-color: #218838;
+  }
+  
+  .btn-info {
+    background-color: #17a2b8;
+    border: none;
+  }
+  .btn-info:hover {
+    background-color: #138496;
+  }
+  
+  .btn-warning {
+    background-color: #ffc107;
+    border: none;
+    color: #212529;
+  }
+  .btn-warning:hover {
+    background-color: #e0a800;
+  }
   
