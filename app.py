@@ -118,8 +118,8 @@ def recommendations():
     prompt = (
         "Analise a lista de jogos a seguir e indique aqueles com maior potencial de pagamento. "
         "Baseie-se no campo 'rtp' e no status 'rtp_status' (up, down ou neutral). "
-        "Responda somente com JSON no formato: {\"recomendacoes\": [{\"nome\": \"\", "
-        "\"rtp\": 0.0, \"prioridade\": \"Alta|Média|Baixa\", \"motivo\": \"\"}]}."
+        "Responda SOMENTE com JSON PURO no formato: "
+        "{\"recomendacoes\":[{\"nome\":\"\",\"rtp\":0.0,\"prioridade\":\"Alta|Média|Baixa\",\"motivo\":\"\"}]}"
     )
 
     try:
@@ -127,21 +127,27 @@ def recommendations():
             model="gpt-4",
             messages=[
                 {"role": "system", "content": prompt},
-                {"role": "user", "content": f"Jogos: {payload}"},
+                {"role": "user", "content": f"{json.dumps(payload, ensure_ascii=False)}"}
             ],
             temperature=0.2,
         )
-        content = completion.choices[0].message.content
-        try:
-            data = json.loads(content)
-        except json.JSONDecodeError:
-            match = re.search(r"({.*})", content, re.DOTALL)
-            if not match:
-                raise ValueError("Invalid response format")
-            data = json.loads(match.group(1))
+        content = completion.choices[0].message.content.strip()
+
+        # Extrai só o JSON da resposta
+        json_match = re.search(r"({.*})", content, re.DOTALL)
+        if not json_match:
+            raise ValueError("A resposta do modelo não continha JSON válido.")
+        data = json.loads(json_match.group(1))
+
+        # Se não vier recomendacoes, força uma lista vazia
+        if "recomendacoes" not in data:
+            data["recomendacoes"] = []
+
         return jsonify(data)
+
     except Exception as exc:
         return jsonify({'error': str(exc)}), 500
+
 
 if __name__ == '__main__':
     import argparse
