@@ -6,7 +6,7 @@ import requests
 from google.protobuf.json_format import MessageToDict
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 from google.protobuf.descriptor_pool import DescriptorPool
-from google.protobuf.message_factory import MessageFactory
+from google.protobuf import message_factory
 
 app = Flask(__name__)
 
@@ -45,9 +45,9 @@ def get_protobuf_message():
 
     pool = DescriptorPool()
     file_desc = pool.Add(proto_schema)
-    factory = MessageFactory(pool)
+    response_desc = file_desc.message_types_by_name["Response"]
 
-    return factory.GetPrototype(file_desc.message_types_by_name['Response'])
+    return message_factory.GetMessageClass(response_desc)
 
 ProtobufMessage = get_protobuf_message()
 
