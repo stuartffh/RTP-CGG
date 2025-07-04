@@ -17,6 +17,7 @@
             <button class="btn btn-success" onclick="sortBy('rtp')">🔼 Ordenar por RTP</button>
             <button class="btn btn-info" onclick="sortBy('name')">🔤 Ordenar por Nome</button>
             <button class="btn btn-warning" onclick="fetchGames()">🔄 Atualizar Agora</button>
+            <button class="btn btn-primary" onclick="generateRecommendations()">💡 Gerar Recomendações</button>
         </div>
 
         <div id="status-message" class="alert alert-danger d-none mt-3" role="alert"></div>
@@ -26,6 +27,7 @@
             </div>
         </div>
         <div id="games-container" class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4"></div>
+        <div id="recommendations-container" class="mt-4"></div>
         <div id="copy-toast" aria-live="polite"></div>
     </div>
 </body>
