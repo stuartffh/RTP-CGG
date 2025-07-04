@@ -64,7 +64,7 @@ function displayGames(games) {
         }[rtpStatus];
 
         container.innerHTML += `
-            <div class="col game-card">
+            <div class="game-card">
                 <div class="card bg-dark text-white h-100">
                     <img src="${imgUrl}" class="card-img-top game-img img-fluid" alt="Imagem de ${game.name}">
                     <div class="card-body text-center">

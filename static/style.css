@@ -87,6 +87,46 @@ body {
     .game-img {
       max-height: 120px;
     }
+}
+
+.controls {
+    margin-bottom: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-start;
+    text-align: left;
+}
+
+.controls .form-control,
+.controls .form-select {
+    width: auto;
+}
+
+.sidebar .controls {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.sidebar .btn {
+    width: 100%;
+}
+
+#games-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+}
+
+.game-card {
+    margin-bottom: 0;
+}
+
+.card-title {
+    cursor: pointer;
+}
+
+#copy-toast {
   }
   
   #copy-toast {
