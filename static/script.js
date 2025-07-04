@@ -2,22 +2,26 @@ let gamesData = [];
 let currentSort = null;
 
 async function fetchGames() {
+    const spinner = document.getElementById('loading-spinner');
+    const statusEl = document.getElementById('status-message');
     try {
+        if (spinner) spinner.classList.remove('d-none');
         const response = await fetch('/api/games');
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         gamesData = await response.json();
-        displayGames(gamesData);
-
-        const statusEl = document.getElementById('status-message');
+        if (currentSort) {
+            sortBy(currentSort);
+        } else {
+            displayGames(gamesData);
+        }
         if (statusEl) {
             statusEl.classList.add('d-none');
             statusEl.textContent = '';
         }
     } catch (error) {
         console.error('Erro ao buscar os jogos:', error);
-        const statusEl = document.getElementById('status-message');
         const message = 'Não foi possível carregar os jogos. Tente novamente mais tarde.';
         if (statusEl) {
             statusEl.textContent = message;
@@ -25,12 +29,8 @@ async function fetchGames() {
         } else {
             alert(message);
         }
-    const response = await fetch("/api/games");
-    gamesData = await response.json();
-    if (currentSort) {
-        sortBy(currentSort);
-    } else {
-        displayGames(gamesData);
+    } finally {
+        if (spinner) spinner.classList.add('d-none');
     }
 }
 
