@@ -16,7 +16,13 @@ DEBUG_REQUESTS = True
 VERIFY_SSL = os.environ.get('VERIFY_SSL', 'false').lower() not in ('false', '0', 'no')
 
 url = "https://cgg.bet.br/casinogo/widgets/v2/live-rtp"
-headers = {...}
+headers = {
+    'accept': 'application/x-protobuf',
+    'content-type': 'application/x-protobuf',
+    'x-language-iso': 'pt-BR',
+    'origin': 'https://cgg.bet.br',
+    'referer': 'https://cgg.bet.br/pt-BR/casinos/casino/lobby'
+}
 data = b'\x08\x01\x10\x02'
 
 def get_protobuf_message():
