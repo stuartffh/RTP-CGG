@@ -50,7 +50,8 @@ def get_protobuf_message():
     file_desc = pool.Add(proto_schema)
     factory = MessageFactory(pool)
 
-    return factory.GetPrototype(file_desc.message_types_by_name['Response'])
+    return factory.GetMessageClass(file_desc.message_types_by_name['Response'])
+
 
 ProtobufMessage = get_protobuf_message()
 
