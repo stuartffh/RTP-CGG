@@ -3,19 +3,37 @@ body {
     background-color: #121212;
     color: #fff;
 }
+
 .game-card {
     margin-bottom: 20px;
 }
+
 .rtp-badge {
     font-size: 0.9em;
 }
+
+/* Imagem responsiva e proporcional */
 .game-img {
     width: 100%;
     height: auto;
     object-fit: contain;
     margin: 0 auto;
     display: block;
+    max-height: 360px; /* altura máxima ajustável */
 }
+
+@media (max-width: 768px) {
+    .game-img {
+        max-height: 140px;
+    }
+}
+
+@media (max-width: 576px) {
+    .game-img {
+        max-height: 120px;
+    }
+}
+
 .controls {
     margin-bottom: 25px;
 }
