@@ -64,18 +64,20 @@ function displayGames(games) {
         }[rtpStatus];
 
         container.innerHTML += `
-            <div class="game-card">
-                <div class="card bg-dark text-white h-100">
-                    <img src="${imgUrl}" class="card-img-top game-img img-fluid" alt="Imagem de ${game.name}">
-                    <div class="card-body text-center">
-                        <h5 class="card-title" title="Clique para copiar">${game.name}</h5>
-                        <p class="card-text mb-1">Provedor: ${game.provider.name}</p>
-                        <p class="card-text">
-                            RTP: <strong>${(game.rtp / 100).toFixed(2)}%</strong> ${statusBadge}
-                        </p>
-                    </div>
-                </div>
-            </div>`;
+        <div class="game-card" data-status="${rtpStatus}">
+          <div class="card bg-dark text-white h-100">
+            <img src="${imgUrl}" class="card-img-top game-img img-fluid" alt="Imagem de ${game.name}">
+            <div class="card-body text-center">
+              <h5 class="card-title" title="Clique para copiar">${game.name}</h5>
+              <p class="card-text mb-1">Provedor: ${game.provider.name}</p>
+              <div class="rtp-container">
+                <div><strong>${(game.rtp / 100).toFixed(2)}%</strong></div>
+                <div>${statusBadge}</div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+      
     });
 }
 
