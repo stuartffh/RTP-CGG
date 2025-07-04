@@ -46,7 +46,7 @@ async function fetchGames() {
     } finally {
         if (spinner) spinner.classList.add('d-none');
     }
-    }
+    
 }
 
 function displayGames(games) {
@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-setInterval(fetchGames, 2000);
+setInterval(fetchGames, 5000);
 fetchGames();
 
 document.addEventListener('click', async (e) => {

@@ -17,7 +17,7 @@ DEBUG_REQUESTS = True  # Altere para False para desativar logs detalhados
 parser = argparse.ArgumentParser(add_help=False)
 parser.add_argument('--insecure', action='store_true', help='Desativa verificação SSL (não recomendado)')
 args, _ = parser.parse_known_args()
-VERIFY_SSL = os.environ.get('VERIFY_SSL', 'true').lower() not in ('false', '0', 'no')
+VERIFY_SSL = os.environ.get('VERIFY_SSL', 'false').lower() not in ('false', '0', 'no')
 if args.insecure:
     VERIFY_SSL = False
 
@@ -29,7 +29,7 @@ headers = {
     'origin': 'https://cgg.bet.br',
     'referer': 'https://cgg.bet.br/pt-BR/casinos/casino/lobby'
 }
-data = b'\x08\x02\x10\x02'
+data = b'\x08\x01\x10\x02'
 
 def get_protobuf_message():
     proto_schema = FileDescriptorProto()
