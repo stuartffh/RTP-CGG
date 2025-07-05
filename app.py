@@ -174,7 +174,6 @@ def cached_image(game_id):
     return send_file(file_path, mimetype="image/webp", cache_timeout=86400)
 
 
-
 @socketio.on("connect")
 def handle_connect():
     if latest_games:
