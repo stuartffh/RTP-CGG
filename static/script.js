@@ -109,17 +109,21 @@ async function fetchWinners() {
         const res = await fetch("/api/last-winners");
         if (!res.ok) throw new Error("Falha na rede");
         const data = await res.json();
+        const winners = Array.isArray(data) ? data : data.items || [];
         const list = document.getElementById("winners-list");
         if (!list) return;
         list.innerHTML = "";
-        data.forEach(w => {
+        winners.forEach(w => {
             const li = document.createElement("li");
             li.className = "list-group-item";
-            if (typeof w === "string") {
+            if (w && w.name && w.last_winner) {
+                const amount = w.last_winner.money.amount / (w.last_winner.money_multiplier || 1);
+                const currency = w.last_winner.money.currency || "";
+                li.textContent = `${w.name} - ${w.last_winner.user_name_cut} - ${amount} ${currency}`;
+            } else if (typeof w === "string") {
                 li.textContent = w;
             } else {
-                const texto = [w.jogo, w.usuario, w.valor].filter(Boolean).join(" - ");
-                li.textContent = texto || JSON.stringify(w);
+                li.textContent = JSON.stringify(w);
             }
             list.appendChild(li);
         });
@@ -360,7 +364,7 @@ document.addEventListener('click', async (e) => {
     document.getElementById('show-winners')?.addEventListener('change', async e => {
         if (e.target.checked) {
             if (!winnersModal) {
-                const el = document.getElementById('winners-modal');
+                const el = document.getElementById('winnersModal');
                 if (el) winnersModal = new bootstrap.Modal(el);
             }
             await fetchWinners();
