@@ -90,6 +90,7 @@
             <option value="down">Abaixo de</option>
           </select>
           <button id="add-alert" class="btn btn-primary w-100 mb-2">Adicionar Alerta</button>
+          <ul id="alerts-list" class="list-group mb-2"></ul>
           <button class="btn btn-success w-100 mb-2" onclick="sortBy('rtp')">
             🔼 Ordenar por RTP
           </button>
@@ -99,13 +100,6 @@
           <button class="btn btn-warning w-100" onclick="fetchGames(true)">
             🔄 Atualizar Agora
           </button>
-          <input id="alert-name" class="form-control" placeholder="Nome do jogo">
-          <input id="alert-value" class="form-control" type="number" step="0.01" placeholder="RTP %">
-          <select id="alert-type" class="form-select">
-              <option value="up">Acima de</option>
-              <option value="down">Abaixo de</option>
-          </select>
-          <button id="add-alert" class="btn btn-primary">Adicionar Alerta</button>
         </div>
       </aside>
       <!-- Conteúdo principal -->
@@ -126,6 +120,5 @@
       </main>
     </div>
   </div>
-  <audio id="alert-sound" src="{{ url_for('static', filename='alert.mp3') }}"></audio>
 </body>
 </html>

@@ -35,6 +35,27 @@ function saveAlerts() {
     }
 }
 
+function renderAlerts() {
+    const list = document.getElementById('alerts-list');
+    if (!list) return;
+    list.innerHTML = '';
+    alerts.forEach((alert, idx) => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.textContent = `${alert.name} ${alert.type === 'up' ? '≥' : '≤'} ${alert.value}%`;
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-sm btn-danger';
+        btn.textContent = 'Remover';
+        btn.addEventListener('click', () => {
+            alerts.splice(idx, 1);
+            saveAlerts();
+            renderAlerts();
+        });
+        li.appendChild(btn);
+        list.appendChild(li);
+    });
+}
+
 // Busca lista de jogos do backend
 async function fetchGames(showSpinner = false) {
     const spinner = document.getElementById('loading-spinner');
@@ -276,10 +297,12 @@ document.addEventListener('click', async (e) => {
         }
         alerts.push({ name, value, type });
         saveAlerts();
+        renderAlerts();
         showToast('Alerta adicionado!');
         if (nameEl) nameEl.value = '';
         if (valueEl) valueEl.value = '';
     });
     loadAlerts();
+    renderAlerts();
     fetchGames(true);
     setInterval(() => fetchGames(false), 1000);
