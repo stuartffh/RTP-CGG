@@ -7,6 +7,7 @@ let alertSound;
 let winnersInterval;
 let winnersModal;
 let gameModal;
+let modalGameId = null;
 let socket;
 const IMAGE_ENDPOINT = '/imagens';
 
@@ -124,6 +125,7 @@ function handleGamesData(data) {
         statusEl.textContent = '';
     }
     if (isFirstLoad) isFirstLoad = false;
+    updateGameModal();
 }
 
 // Busca lista de jogos do backend
@@ -184,6 +186,25 @@ function connectSocket() {
     socket.on('games_update', data => handleGamesData(data));
 }
 
+
+function updateGameModal() {
+    if (modalGameId === null) return;
+    const game = gamesData.find(g => g.id === modalGameId);
+    if (!game) {
+        modalGameId = null;
+        gameModal?.hide();
+        return;
+    }
+    if (!gameModal) {
+        const el = document.getElementById('gameModal');
+        if (el) gameModal = new bootstrap.Modal(el);
+        else return;
+    }
+    document.getElementById('gameModalLabel').textContent = game.name;
+    const imgEl = document.getElementById('gameModalImg');
+    if (imgEl) {
+        imgEl.src = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
+
 function openGameModal(id) {
     const game = gamesData.find(g => g.id === id);
     if (!game) return;
@@ -195,6 +216,9 @@ function openGameModal(id) {
     document.getElementById('gameModalLabel').textContent = game.name;
     const imgEl = document.getElementById('gameModalImg');
     if (imgEl) {
+
+        imgEl.src = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
+
         imgEl.src = `${IMAGE_ENDPOINT}/${game.id}.webp`;
         imgEl.alt = `Imagem de ${game.name}`;
     }
@@ -222,6 +246,12 @@ function openGameModal(id) {
             up: '<span class="badge bg-success">▲ Semana</span>',
             neutral: '<span class="badge bg-secondary">▬ Semana</span>',
         }[game.status_semana || 'neutral'];
+}
+      
+function openGameModal(id) {
+    modalGameId = id;
+    updateGameModal();
+    gameModal?.show();
     gameModal.show();
 }
 
