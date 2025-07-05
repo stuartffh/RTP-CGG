@@ -2,6 +2,7 @@ import os
 import urllib3
 from flask import Flask, jsonify, render_template
 from flask_socketio import SocketIO, emit
+from flask import send_file, abort
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import requests
@@ -32,6 +33,9 @@ headers = {
 }
 data = b"\x08\x01\x10\x02"
 data_weekly = b"\x08\x02\x10\x02"
+
+IMAGE_CACHE_DIR = "image_cache"
+os.makedirs(IMAGE_CACHE_DIR, exist_ok=True)
 
 
 def get_protobuf_message():
@@ -149,6 +153,23 @@ def games():
     global latest_games
     latest_games = fetch_games_data()
     return jsonify(latest_games)
+
+
+@app.route("/imagens/<int:game_id>.webp")
+def cached_image(game_id):
+    file_path = os.path.join(IMAGE_CACHE_DIR, f"{game_id}.webp")
+    if not os.path.exists(file_path):
+        remote_url = f"https://cgg.bet.br/static/v1/casino/game/0/{game_id}/big.webp"
+        try:
+            resp = requests.get(remote_url, verify=VERIFY_SSL, timeout=10)
+            resp.raise_for_status()
+            with open(file_path, "wb") as img_file:
+                img_file.write(resp.content)
+        except requests.RequestException:
+            abort(404)
+    response = send_file(file_path, mimetype="image/webp")
+    response.headers["Cache-Control"] = "public, max-age=86400"
+    return response
 
 
 @socketio.on("connect")
