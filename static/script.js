@@ -1,6 +1,7 @@
 let gamesData = [];
 let currentSort = null;
 let toastTimeout;
+let isFirstLoad = true;
 
 // Mostra toast de feedback
 function showToast(message) {
@@ -13,12 +14,12 @@ function showToast(message) {
 }
 
 // Busca lista de jogos do backend
-async function fetchGames() {
+async function fetchGames(showSpinner = false) {
     const spinner = document.getElementById('loading-spinner');
     const statusEl = document.getElementById('status-message');
 
     try {
-        if (spinner) spinner.classList.remove('d-none');
+        if (spinner && showSpinner) spinner.classList.remove('d-none');
         const response = await fetch('/api/games');
         if (!response.ok) throw new Error('Erro na resposta da rede');
 
@@ -35,6 +36,7 @@ async function fetchGames() {
             statusEl.classList.add('d-none');
             statusEl.textContent = '';
         }
+        if (isFirstLoad) isFirstLoad = false;
     } catch (error) {
         console.error('Erro ao buscar jogos:', error);
         const message = 'Não foi possível carregar os jogos. Tente novamente.';
@@ -45,7 +47,7 @@ async function fetchGames() {
             alert(message);
         }
     } finally {
-        if (spinner) spinner.classList.add('d-none');
+        if (spinner && showSpinner) spinner.classList.add('d-none');
     }
 }
 
@@ -166,6 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('show-negative')?.addEventListener('change', filterAndRender);
     document.getElementById('min-rtp')?.addEventListener('input', debounce(filterAndRender, 300));
     document.getElementById('max-rtp')?.addEventListener('input', debounce(filterAndRender, 300));
-    fetchGames();
-    setInterval(fetchGames, 5000);
+    fetchGames(true);
+    setInterval(() => fetchGames(false), 5000);
 });
