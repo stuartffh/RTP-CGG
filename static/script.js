@@ -104,7 +104,7 @@ async function fetchGames(showSpinner = false) {
 }
 
 // Exibe os jogos na tela
-function createGameCard(game, imgUrl, statusBadge, rtpStatus) {
+function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
     const wrapper = document.createElement('div');
     wrapper.className = 'game-card';
     wrapper.dataset.status = rtpStatus;
@@ -132,16 +132,26 @@ function createGameCard(game, imgUrl, statusBadge, rtpStatus) {
     const rtpContainer = document.createElement('div');
     rtpContainer.className = 'rtp-container';
 
-    const rtpValueDiv = document.createElement('div');
-    const rtpStrong = document.createElement('strong');
-    rtpStrong.textContent = `${(game.rtp / 100).toFixed(2)}%`;
-    rtpValueDiv.appendChild(rtpStrong);
+    const dailyDiv = document.createElement('div');
+    const dailyStrong = document.createElement('strong');
+    dailyStrong.textContent = `${(game.rtp / 100).toFixed(2)}%`;
+    const dailyBadgeDiv = document.createElement('div');
+    dailyBadgeDiv.innerHTML = dailyBadge;
+    dailyDiv.appendChild(dailyStrong);
+    dailyDiv.appendChild(dailyBadgeDiv);
 
-    const badgeDiv = document.createElement('div');
-    badgeDiv.innerHTML = statusBadge;
+    const weeklyDiv = document.createElement('div');
+    const weeklyStrong = document.createElement('strong');
+    const weeklyValue = game.rtp_semana ?? null;
+    weeklyStrong.textContent =
+        weeklyValue !== null ? `${(weeklyValue / 100).toFixed(2)}%` : '--';
+    const weeklyBadgeDiv = document.createElement('div');
+    weeklyBadgeDiv.innerHTML = weeklyBadge;
+    weeklyDiv.appendChild(weeklyStrong);
+    weeklyDiv.appendChild(weeklyBadgeDiv);
 
-    rtpContainer.appendChild(rtpValueDiv);
-    rtpContainer.appendChild(badgeDiv);
+    rtpContainer.appendChild(dailyDiv);
+    rtpContainer.appendChild(weeklyDiv);
 
     body.appendChild(title);
     body.appendChild(provider);
@@ -151,7 +161,16 @@ function createGameCard(game, imgUrl, statusBadge, rtpStatus) {
     card.appendChild(body);
     wrapper.appendChild(card);
 
-    return { wrapper, img, title, provider, rtpStrong, badgeDiv };
+    return {
+        wrapper,
+        img,
+        title,
+        provider,
+        dailyStrong,
+        dailyBadgeDiv,
+        weeklyStrong,
+        weeklyBadgeDiv,
+    };
 }
 
 function displayGames(games) {
@@ -164,25 +183,53 @@ function displayGames(games) {
         present.add(game.id);
         const imgUrl = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
         const rtpStatus = game.rtp_status || 'neutral';
-        const statusBadge = {
-            down: '<span class="badge bg-danger rtp-badge">▼ RTP</span>',
-            up: '<span class="badge bg-success rtp-badge">▲ RTP</span>',
-            neutral: '<span class="badge bg-secondary rtp-badge">▬ Neutro</span>'
+        const dailyBadge = {
+            down: '<span class="badge bg-danger rtp-badge">▼ Dia</span>',
+            up: '<span class="badge bg-success rtp-badge">▲ Dia</span>',
+            neutral: '<span class="badge bg-secondary rtp-badge">▬ Dia</span>',
         }[rtpStatus];
+
+        const weeklyStatus = game.rtp_semana_status || 'neutral';
+        const weeklyBadge = {
+            down: '<span class="badge bg-danger rtp-badge">▼ Semana</span>',
+            up: '<span class="badge bg-success rtp-badge">▲ Semana</span>',
+            neutral: '<span class="badge bg-secondary rtp-badge">▬ Semana</span>',
+        }[weeklyStatus];
 
         let cardData = gameCards.get(game.id);
         if (!cardData) {
-            cardData = createGameCard(game, imgUrl, statusBadge, rtpStatus);
+            cardData = createGameCard(
+                game,
+                imgUrl,
+                dailyBadge,
+                weeklyBadge,
+                rtpStatus,
+            );
             gameCards.set(game.id, cardData);
         } else {
-            const { wrapper, img, title, provider, rtpStrong, badgeDiv } = cardData;
+            const {
+                wrapper,
+                img,
+                title,
+                provider,
+                dailyStrong,
+                dailyBadgeDiv,
+                weeklyStrong,
+                weeklyBadgeDiv,
+            } = cardData;
             wrapper.dataset.status = rtpStatus;
             img.src = imgUrl;
             img.alt = `Imagem de ${game.name}`;
             title.textContent = game.name;
             provider.textContent = `Provedor: ${game.provider.name}`;
-            rtpStrong.textContent = `${(game.rtp / 100).toFixed(2)}%`;
-            badgeDiv.innerHTML = statusBadge;
+            dailyStrong.textContent = `${(game.rtp / 100).toFixed(2)}%`;
+            dailyBadgeDiv.innerHTML = dailyBadge;
+            const weeklyValue = game.rtp_semana ?? null;
+            weeklyStrong.textContent =
+                weeklyValue !== null
+                    ? `${(weeklyValue / 100).toFixed(2)}%`
+                    : '--';
+            weeklyBadgeDiv.innerHTML = weeklyBadge;
         }
 
         fragment.appendChild(cardData.wrapper);
