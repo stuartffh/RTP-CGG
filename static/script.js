@@ -5,6 +5,7 @@ let isFirstLoad = true;
 let alerts = [];
 let alertSound;
 const ALERT_SOUND_SRC='data:audio/wav;base64,UklGRqQMAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YYAMAAAAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQ==';
+const gameCards = new Map();
 
 // Mostra toast de feedback
 function showToast(message) {
@@ -82,11 +83,64 @@ async function fetchGames(showSpinner = false) {
 }
 
 // Exibe os jogos na tela
+function createGameCard(game, imgUrl, statusBadge, rtpStatus) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'game-card';
+    wrapper.dataset.status = rtpStatus;
+
+    const card = document.createElement('div');
+    card.className = 'card bg-dark text-white h-100';
+
+    const img = document.createElement('img');
+    img.className = 'card-img-top game-img img-fluid';
+    img.alt = `Imagem de ${game.name}`;
+    img.src = imgUrl;
+
+    const body = document.createElement('div');
+    body.className = 'card-body text-center';
+
+    const title = document.createElement('h5');
+    title.className = 'card-title';
+    title.title = 'Clique para copiar';
+    title.textContent = game.name;
+
+    const provider = document.createElement('p');
+    provider.className = 'card-text mb-1';
+    provider.textContent = `Provedor: ${game.provider.name}`;
+
+    const rtpContainer = document.createElement('div');
+    rtpContainer.className = 'rtp-container';
+
+    const rtpValueDiv = document.createElement('div');
+    const rtpStrong = document.createElement('strong');
+    rtpStrong.textContent = `${(game.rtp / 100).toFixed(2)}%`;
+    rtpValueDiv.appendChild(rtpStrong);
+
+    const badgeDiv = document.createElement('div');
+    badgeDiv.innerHTML = statusBadge;
+
+    rtpContainer.appendChild(rtpValueDiv);
+    rtpContainer.appendChild(badgeDiv);
+
+    body.appendChild(title);
+    body.appendChild(provider);
+    body.appendChild(rtpContainer);
+
+    card.appendChild(img);
+    card.appendChild(body);
+    wrapper.appendChild(card);
+
+    return { wrapper, img, title, provider, rtpStrong, badgeDiv };
+}
+
 function displayGames(games) {
     const container = document.getElementById('games-container');
-    container.innerHTML = '';
+    if (!container) return;
+    const fragment = document.createDocumentFragment();
+    const present = new Set();
 
     games.forEach(game => {
+        present.add(game.id);
         const imgUrl = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
         const rtpStatus = game.rtp_status || 'neutral';
         const statusBadge = {
@@ -95,22 +149,31 @@ function displayGames(games) {
             neutral: '<span class="badge bg-secondary rtp-badge">▬ Neutro</span>'
         }[rtpStatus];
 
-        container.innerHTML += `
-        <div class="game-card" data-status="${rtpStatus}">
-          <div class="card bg-dark text-white h-100">
-            <img src="${imgUrl}" class="card-img-top game-img img-fluid" alt="Imagem de ${game.name}">
-            <div class="card-body text-center">
-              <h5 class="card-title" title="Clique para copiar">${game.name}</h5>
-              <p class="card-text mb-1">Provedor: ${game.provider.name}</p>
-              <div class="rtp-container">
-                <div><strong>${(game.rtp / 100).toFixed(2)}%</strong></div>
-                <div>${statusBadge}</div>
-              </div>
-            </div>
-          </div>
-        </div>`;
-      
+        let cardData = gameCards.get(game.id);
+        if (!cardData) {
+            cardData = createGameCard(game, imgUrl, statusBadge, rtpStatus);
+            gameCards.set(game.id, cardData);
+        } else {
+            const { wrapper, img, title, provider, rtpStrong, badgeDiv } = cardData;
+            wrapper.dataset.status = rtpStatus;
+            img.src = imgUrl;
+            img.alt = `Imagem de ${game.name}`;
+            title.textContent = game.name;
+            provider.textContent = `Provedor: ${game.provider.name}`;
+            rtpStrong.textContent = `${(game.rtp / 100).toFixed(2)}%`;
+            badgeDiv.innerHTML = statusBadge;
+        }
+
+        fragment.appendChild(cardData.wrapper);
     });
+
+    container.replaceChildren(fragment);
+
+    for (const id of Array.from(gameCards.keys())) {
+        if (!present.has(id)) {
+            gameCards.delete(id);
+        }
+    }
 }
 
 function populateProviders() {
