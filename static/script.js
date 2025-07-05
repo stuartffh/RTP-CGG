@@ -6,6 +6,7 @@ let alerts = [];
 let alertSound;
 let winnersInterval;
 let winnersModal;
+let gameModal;
 let socket;
 
 function setupWinnersModal() {
@@ -182,12 +183,54 @@ function connectSocket() {
     socket.on('games_update', data => handleGamesData(data));
 }
 
+function openGameModal(id) {
+    const game = gamesData.find(g => g.id === id);
+    if (!game) return;
+    if (!gameModal) {
+        const el = document.getElementById('gameModal');
+        if (el) gameModal = new bootstrap.Modal(el);
+    }
+    if (!gameModal) return;
+    document.getElementById('gameModalLabel').textContent = game.name;
+    const imgEl = document.getElementById('gameModalImg');
+    if (imgEl) {
+        imgEl.src = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
+        imgEl.alt = `Imagem de ${game.name}`;
+    }
+    const provEl = document.getElementById('gameModalProvider');
+    if (provEl) provEl.textContent = `Provedor: ${game.provider.name}`;
+    const dailyStrong = document.getElementById('gameModalDaily');
+    const dailyBadge = document.getElementById('gameModalDailyBadge');
+    if (dailyStrong)
+        dailyStrong.textContent = `${(game.rtp / 100).toFixed(2)}%`;
+    if (dailyBadge)
+        dailyBadge.innerHTML = {
+            down: '<span class="badge bg-danger">▼ Dia</span>',
+            up: '<span class="badge bg-success">▲ Dia</span>',
+            neutral: '<span class="badge bg-secondary">▬ Dia</span>',
+        }[game.rtp_status || 'neutral'];
+    const weeklyStrong = document.getElementById('gameModalWeekly');
+    const weeklyBadge = document.getElementById('gameModalWeeklyBadge');
+    const weekVal = game.rtp_semana ?? null;
+    if (weeklyStrong)
+        weeklyStrong.textContent =
+            weekVal !== null ? `${(weekVal / 100).toFixed(2)}%` : '--';
+    if (weeklyBadge)
+        weeklyBadge.innerHTML = {
+            down: '<span class="badge bg-danger">▼ Semana</span>',
+            up: '<span class="badge bg-success">▲ Semana</span>',
+            neutral: '<span class="badge bg-secondary">▬ Semana</span>',
+        }[game.status_semana || 'neutral'];
+    gameModal.show();
+}
+
 
 // Exibe os jogos na tela
 function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
     const wrapper = document.createElement('div');
     wrapper.className = 'game-card';
     wrapper.dataset.status = rtpStatus;
+    wrapper.dataset.id = game.id;
 
     const card = document.createElement('div');
     card.className = 'card bg-dark text-white h-100';
@@ -196,6 +239,7 @@ function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
     img.className = 'card-img-top game-img img-fluid';
     img.alt = `Imagem de ${game.name}`;
     img.src = imgUrl;
+    img.addEventListener('click', () => openGameModal(game.id));
 
     const body = document.createElement('div');
     body.className = 'card-body text-center';
@@ -298,6 +342,7 @@ function displayGames(games) {
                 weeklyBadgeDiv,
             } = cardData;
             wrapper.dataset.status = rtpStatus;
+            wrapper.dataset.id = game.id;
             img.src = imgUrl;
             img.alt = `Imagem de ${game.name}`;
             title.textContent = game.name;
