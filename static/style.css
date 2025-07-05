@@ -86,6 +86,20 @@ body {
   .rtp-badge {
     font-size: 0.85em;
   }
+
+  /* Container do valor de RTP e badge */
+  .rtp-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .rtp-container div {
+    margin: 0;
+    text-align: center;
+  }
   
   /* Imagem do jogo */
   .game-img {
