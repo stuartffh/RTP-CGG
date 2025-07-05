@@ -61,27 +61,27 @@
               Positivos
             </label>
           </div>
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="show-negative"
-                checked
-              />
-              <label class="form-check-label" for="show-negative">
-                Negativos
-              </label>
-            </div>
-            <div class="form-check">
-              <input
-                class="form-check-input"
-                type="checkbox"
-                id="show-winners"
-              />
-              <label class="form-check-label" for="show-winners">
-                Vencedores
-              </label>
-            </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="show-negative"
+              checked
+            />
+            <label class="form-check-label" for="show-negative">
+              Negativos
+            </label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="show-winners"
+            />
+            <label class="form-check-label" for="show-winners">
+              Mostrar vencedores
+            </label>
+          </div>
           <input
             id="alert-name"
             type="text"
@@ -126,40 +126,41 @@
         </div>
         <div id="games-container" class="games-grid"></div>
         <div id="copy-toast" aria-live="polite"></div>
-          <audio id="alert-sound" preload="auto"></audio>
-        </main>
-      </div>
-      <div
-        class="modal fade"
-        id="winnersModal"
-        tabindex="-1"
-        aria-labelledby="winnersModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog modal-dialog-scrollable">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="winnersModalLabel">Últimos Vencedores</h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Fechar"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <ul id="winners-list" class="list-group"></ul>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >Fechar</button>
-            </div>
+        <audio id="alert-sound" preload="auto"></audio>
+      </main>
+    </div>
+    <!-- Modal único de vencedores -->
+    <div
+      class="modal fade"
+      id="winnersModal"
+      tabindex="-1"
+      aria-labelledby="winnersModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="winnersModalLabel">Últimos Vencedores</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Fechar"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <ul id="winners-list" class="list-group"></ul>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >Fechar</button>
           </div>
         </div>
       </div>
     </div>
-  </body>
+  </div>
+</body>
 </html>

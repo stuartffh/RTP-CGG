@@ -4,6 +4,8 @@ let toastTimeout;
 let isFirstLoad = true;
 let alerts = [];
 let alertSound;
+let winnersInterval;
+let winnersModal;
 const ALERT_SOUND_SRC='data:audio/wav;base64,UklGRqQMAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YYAMAAAAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQAAgVr/f4FaAAB/pQGAf6UAAIFa/3+BWgAAf6UBgH+lAACBWv9/gVoAAH+lAYB/pQ==';
 const gameCards = new Map();
 
@@ -102,6 +104,30 @@ async function fetchGames(showSpinner = false) {
         if (spinner && showSpinner) spinner.classList.add('d-none');
     }
 }
+async function fetchWinners() {
+    try {
+        const res = await fetch("/api/last-winners");
+        if (!res.ok) throw new Error("Falha na rede");
+        const data = await res.json();
+        const list = document.getElementById("winners-list");
+        if (!list) return;
+        list.innerHTML = "";
+        data.forEach(w => {
+            const li = document.createElement("li");
+            li.className = "list-group-item";
+            if (typeof w === "string") {
+                li.textContent = w;
+            } else {
+                const texto = [w.jogo, w.usuario, w.valor].filter(Boolean).join(" - ");
+                li.textContent = texto || JSON.stringify(w);
+            }
+            list.appendChild(li);
+        });
+    } catch (err) {
+        console.error("Erro ao buscar vencedores", err);
+    }
+}
+
 
 // Exibe os jogos na tela
 function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
@@ -331,6 +357,21 @@ document.addEventListener('click', async (e) => {
     document.getElementById('show-negative')?.addEventListener('change', filterAndRender);
     document.getElementById('min-rtp')?.addEventListener('input', debounce(filterAndRender, 300));
     document.getElementById('max-rtp')?.addEventListener('input', debounce(filterAndRender, 300));
+    document.getElementById('show-winners')?.addEventListener('change', async e => {
+        if (e.target.checked) {
+            if (!winnersModal) {
+                const el = document.getElementById('winners-modal');
+                if (el) winnersModal = new bootstrap.Modal(el);
+            }
+            await fetchWinners();
+            winnersModal?.show();
+            winnersInterval = setInterval(fetchWinners, 1000);
+        } else {
+            clearInterval(winnersInterval);
+            winnersInterval = null;
+            winnersModal?.hide();
+        }
+    });
     document.getElementById('add-alert')?.addEventListener('click', () => {
         const nameEl = document.getElementById('alert-name');
         const valueEl = document.getElementById('alert-value');
