@@ -30,6 +30,7 @@ headers = {
     "referer": "https://cgg.bet.br/pt-BR/casinos/casino/lobby",
 }
 data = b"\x08\x01\x10\x02"
+data_weekly = b"\x08\x02\x10\x02"
 
 
 def get_protobuf_message():
@@ -89,13 +90,29 @@ def games():
     response = requests.post(url, headers=headers, data=data, verify=VERIFY_SSL)
 
     if DEBUG_REQUESTS:
+        print("\n[DEBUG] >>> Enviando Requisição Semanal <<<")
+        print(f"[DEBUG] Data Semanal (bytes): {data_weekly}")
+
+    response_weekly = requests.post(
+        url, headers=headers, data=data_weekly, verify=VERIFY_SSL
+    )
+
+    if DEBUG_REQUESTS:
         print("\n[DEBUG] <<< Recebendo Resposta >>>")
         print(f"[DEBUG] Status Code: {response.status_code}")
         print(f"[DEBUG] Response Content (raw bytes): {response.content}\n")
+        print("\n[DEBUG] <<< Recebendo Resposta Semanal >>>")
+        print(f"[DEBUG] Status Code: {response_weekly.status_code}")
+        print(f"[DEBUG] Response Content (raw bytes): {response_weekly.content}\n")
 
     decoded_message = ProtobufMessage()
     decoded_message.ParseFromString(response.content)
     games = MessageToDict(decoded_message).get("games", [])
+
+    decoded_weekly = ProtobufMessage()
+    decoded_weekly.ParseFromString(response_weekly.content)
+    games_weekly = MessageToDict(decoded_weekly).get("games", [])
+    week_map = {g["id"]: g for g in games_weekly}
 
     for game in games:
         extra = game.get("extra")
@@ -104,6 +121,17 @@ def games():
             game["rtp_status"] = "down" if game["extra"] < 0 else "up"
         else:
             game["rtp_status"] = "neutral"
+
+        week = week_map.get(game["id"])
+        game["rtp_semana"] = week.get("rtp") if week else None
+        game["extra_semana"] = (
+            decode_signed(int(week["extra"])) if week and week.get("extra") else None
+        )
+        game["status_semana"] = (
+            "down"
+            if game["extra_semana"] < 0
+            else "up" if game["extra_semana"] else "neutral"
+        )
 
     if DEBUG_REQUESTS:
         print("[DEBUG] <<< Mensagem Decodificada (JSON) >>>")
