@@ -186,6 +186,7 @@ function connectSocket() {
     socket.on('games_update', data => handleGamesData(data));
 }
 
+
 function updateGameModal() {
     if (modalGameId === null) return;
     const game = gamesData.find(g => g.id === modalGameId);
@@ -203,6 +204,7 @@ function updateGameModal() {
     const imgEl = document.getElementById('gameModalImg');
     if (imgEl) {
         imgEl.src = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
+
 function openGameModal(id) {
     const game = gamesData.find(g => g.id === id);
     if (!game) return;
@@ -214,6 +216,7 @@ function openGameModal(id) {
     document.getElementById('gameModalLabel').textContent = game.name;
     const imgEl = document.getElementById('gameModalImg');
     if (imgEl) {
+        imgEl.src = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
         imgEl.src = `${IMAGE_ENDPOINT}/${game.id}.webp`;
         imgEl.alt = `Imagem de ${game.name}`;
     }
@@ -247,7 +250,6 @@ function openGameModal(id) {
     modalGameId = id;
     updateGameModal();
     gameModal?.show();
-
     gameModal.show();
 }
 
