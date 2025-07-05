@@ -1,6 +1,7 @@
 import os
 import urllib3
 from flask import Flask, jsonify, render_template
+from flask_socketio import SocketIO, emit
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import requests
@@ -10,6 +11,7 @@ from google.protobuf.descriptor_pool import DescriptorPool
 from google.protobuf.json_format import MessageToDict
 
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 DEBUG_REQUESTS = os.environ.get("DEBUG_REQUESTS", "false").lower() in (
     "1",
@@ -65,6 +67,8 @@ def get_protobuf_message():
 
 ProtobufMessage = get_protobuf_message()
 
+latest_games = []
+
 
 def decode_signed(value):
     if value > (1 << 63):
@@ -72,13 +76,7 @@ def decode_signed(value):
     return value
 
 
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-
-@app.route("/api/games")
-def games():
+def fetch_games_data():
     if DEBUG_REQUESTS:
         print("\n[DEBUG] >>> Enviando Requisição <<<")
         print(f"[DEBUG] URL: {url}")
@@ -127,7 +125,6 @@ def games():
             decode_signed(int(week["extra"])) if week and week.get("extra") else None
         )
 
-        # 🚀 Aqui está o bloco corrigido
         if game["extra_semana"] is None:
             game["status_semana"] = "neutral"
         elif game["extra_semana"] < 0:
@@ -139,7 +136,35 @@ def games():
         print("[DEBUG] <<< Mensagem Decodificada (JSON) >>>")
         print(games)
 
-    return jsonify(games)
+    return games
+
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
+@app.route("/api/games")
+def games():
+    global latest_games
+    latest_games = fetch_games_data()
+    return jsonify(latest_games)
+
+
+@socketio.on("connect")
+def handle_connect():
+    if latest_games:
+        emit("games_update", latest_games)
+
+
+def background_fetch():
+    while True:
+        try:
+            global latest_games
+            latest_games = fetch_games_data()
+            socketio.emit("games_update", latest_games)
+        finally:
+            socketio.sleep(1)
 
 
 @app.route("/api/last-winners")
@@ -187,5 +212,8 @@ if __name__ == "__main__":
     if args.insecure:
         VERIFY_SSL = False
 
+    socketio.start_background_task(background_fetch)
     debug_mode = os.environ.get("FLASK_DEBUG", "false").lower() in ("1", "true", "yes")
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=debug_mode)
+    socketio.run(
+        app, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)), debug=debug_mode
+    )

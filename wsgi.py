@@ -1,4 +1,6 @@
-from app import app
+from app import app, socketio, background_fetch
+
+socketio.start_background_task(background_fetch)
 
 if __name__ == "__main__":
-    app.run()
+    socketio.run(app)

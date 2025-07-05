@@ -6,6 +6,7 @@ let alerts = [];
 let alertSound;
 let winnersInterval;
 let winnersModal;
+let socket;
 
 function setupWinnersModal() {
     const modalEl = document.getElementById('winnersModal');
@@ -94,6 +95,35 @@ function renderAlerts() {
     });
 }
 
+function handleGamesData(data) {
+    gamesData = data;
+    alerts.forEach(alert => {
+        const game = gamesData.find(
+            g => g.name.toLowerCase() === alert.name.toLowerCase(),
+        );
+        if (!game) return;
+        const rtp = game.rtp / 100;
+        if (
+            (alert.type === 'up' && rtp >= alert.value) ||
+            (alert.type === 'down' && rtp <= alert.value)
+        ) {
+            alertSound?.play().catch(err => console.error('Falha ao tocar alerta', err));
+        }
+    });
+    populateProviders();
+    if (currentSort) {
+        sortBy(currentSort);
+    } else {
+        filterAndRender();
+    }
+    const statusEl = document.getElementById('status-message');
+    if (statusEl) {
+        statusEl.classList.add('d-none');
+        statusEl.textContent = '';
+    }
+    if (isFirstLoad) isFirstLoad = false;
+}
+
 // Busca lista de jogos do backend
 async function fetchGames(showSpinner = false) {
     const spinner = document.getElementById('loading-spinner');
@@ -104,29 +134,8 @@ async function fetchGames(showSpinner = false) {
         const response = await fetch('/api/games');
         if (!response.ok) throw new Error('Erro na resposta da rede');
 
-        gamesData = await response.json();
-        alerts.forEach(alert => {
-            const game = gamesData.find(g => g.name.toLowerCase() === alert.name.toLowerCase());
-            if (!game) return;
-            const rtp = game.rtp / 100;
-            if ((alert.type === 'up' && rtp >= alert.value) ||
-                (alert.type === 'down' && rtp <= alert.value)) {
-                alertSound?.play().catch(err => console.error('Falha ao tocar alerta', err));
-            }
-        });
-        populateProviders();
-
-        if (currentSort) {
-            sortBy(currentSort);
-        } else {
-            filterAndRender();
-        }
-
-        if (statusEl) {
-            statusEl.classList.add('d-none');
-            statusEl.textContent = '';
-        }
-        if (isFirstLoad) isFirstLoad = false;
+        const data = await response.json();
+        handleGamesData(data);
     } catch (error) {
         console.error('Erro ao buscar jogos:', error);
         const message = 'Não foi possível carregar os jogos. Tente novamente.';
@@ -166,6 +175,11 @@ async function fetchWinners() {
     } catch (err) {
         console.error("Erro ao buscar vencedores", err);
     }
+}
+
+function connectSocket() {
+    socket = io();
+    socket.on('games_update', data => handleGamesData(data));
 }
 
 
@@ -433,5 +447,4 @@ document.addEventListener('click', async (e) => {
     });
     loadAlerts();
     renderAlerts();
-    fetchGames(true);
-    setInterval(() => fetchGames(false), 1000);
+    connectSocket();
