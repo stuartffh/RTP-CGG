@@ -72,6 +72,10 @@
               Negativos
             </label>
           </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="show-winners" />
+            <label class="form-check-label" for="show-winners">Mostrar vencedores</label>
+          </div>
           <input
             id="alert-name"
             type="text"
@@ -120,5 +124,19 @@
       </main>
     </div>
   </div>
+  <div class="modal fade" id="winners-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content bg-dark text-white">
+        <div class="modal-header">
+          <h5 class="modal-title">Últimos Vencedores</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+          <ul id="winners-list" class="list-group"></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
