@@ -203,7 +203,9 @@ function updateGameModal() {
     document.getElementById('gameModalLabel').textContent = game.name;
     const imgEl = document.getElementById('gameModalImg');
     if (imgEl) {
-        imgEl.src = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
+                imgEl.src = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
+            }
+        }
 
 function openGameModal(id) {
     const game = gamesData.find(g => g.id === id);
@@ -521,6 +523,7 @@ document.addEventListener('click', async (e) => {
         if (nameEl) nameEl.value = '';
         if (valueEl) valueEl.value = '';
     });
+
     loadAlerts();
     renderAlerts();
     connectSocket();
