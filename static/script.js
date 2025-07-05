@@ -60,8 +60,8 @@ function displayGames(games) {
         const imgUrl = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
         const rtpStatus = game.rtp_status || 'neutral';
         const statusBadge = {
-            down: '<span class="badge bg-danger rtp-badge">▼ RTP Baixo</span>',
-            up: '<span class="badge bg-success rtp-badge">▲ RTP Alto</span>',
+            down: '<span class="badge bg-danger rtp-badge">▼ RTP</span>',
+            up: '<span class="badge bg-success rtp-badge">▲ RTP</span>',
             neutral: '<span class="badge bg-secondary rtp-badge">▬ Neutro</span>'
         }[rtpStatus];
 
