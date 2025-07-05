@@ -142,6 +142,40 @@ def games():
     return jsonify(games)
 
 
+@app.route("/api/last-winners")
+def last_winners():
+    winners_url = "https://cgg.bet.br/casinogo/widgets/last-winners"
+    winners_headers = headers.copy()
+    winners_headers["accept"] = "application/json"
+
+    try:
+        if DEBUG_REQUESTS:
+            print("\n[DEBUG] >>> Enviando Requisição Últimos Vencedores <<<")
+            print(f"[DEBUG] URL: {winners_url}")
+            print(f"[DEBUG] Headers: {winners_headers}")
+            print(f"[DEBUG] SSL Verify: {VERIFY_SSL}")
+
+        response = requests.post(
+            winners_url, headers=winners_headers, verify=VERIFY_SSL
+        )
+        response.raise_for_status()
+
+        if DEBUG_REQUESTS:
+            print("\n[DEBUG] <<< Resposta Últimos Vencedores >>>")
+            print(f"[DEBUG] Status Code: {response.status_code}")
+            print(f"[DEBUG] Conteúdo JSON: {response.text}\n")
+
+        return jsonify(response.json())
+    except requests.RequestException as exc:
+        if DEBUG_REQUESTS:
+            print("[DEBUG] Erro na requisição de últimos vencedores")
+            print(exc)
+        return (
+            jsonify({"erro": "Falha ao buscar últimos vencedores"}),
+            500,
+        )
+
+
 if __name__ == "__main__":
     import argparse
 
