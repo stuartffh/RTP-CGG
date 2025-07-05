@@ -189,7 +189,7 @@ function displayGames(games) {
             neutral: '<span class="badge bg-secondary rtp-badge">▬ Dia</span>',
         }[rtpStatus];
 
-        const weeklyStatus = game.rtp_semana_status || 'neutral';
+        const weeklyStatus = game.status_semana || 'neutral';
         const weeklyBadge = {
             down: '<span class="badge bg-danger rtp-badge">▼ Semana</span>',
             up: '<span class="badge bg-success rtp-badge">▲ Semana</span>',
