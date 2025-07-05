@@ -8,6 +8,7 @@ let winnersInterval;
 let winnersModal;
 let gameModal;
 let socket;
+const IMAGE_ENDPOINT = '/imagens';
 
 function setupWinnersModal() {
     const modalEl = document.getElementById('winnersModal');
@@ -194,7 +195,7 @@ function openGameModal(id) {
     document.getElementById('gameModalLabel').textContent = game.name;
     const imgEl = document.getElementById('gameModalImg');
     if (imgEl) {
-        imgEl.src = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
+        imgEl.src = `${IMAGE_ENDPOINT}/${game.id}.webp`;
         imgEl.alt = `Imagem de ${game.name}`;
     }
     const provEl = document.getElementById('gameModalProvider');
@@ -305,7 +306,7 @@ function displayGames(games) {
 
     games.forEach(game => {
         present.add(game.id);
-        const imgUrl = `https://cgg.bet.br/static/v1/casino/game/0/${game.id}/big.webp`;
+        const imgUrl = `${IMAGE_ENDPOINT}/${game.id}.webp`;
         const rtpStatus = game.rtp_status || 'neutral';
         const dailyBadge = {
             down: '<span class="badge bg-danger rtp-badge">▼ Dia</span>',
