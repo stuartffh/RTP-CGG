@@ -220,4 +220,3 @@ document.addEventListener('click', async (e) => {
     loadAlerts();
     fetchGames(true);
     setInterval(() => fetchGames(false), 1000);
-});
