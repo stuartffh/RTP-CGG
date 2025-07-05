@@ -133,6 +133,42 @@
         <audio id="alert-sound" preload="auto"></audio>
       </main>
     </div>
+    <!-- Modal detalhes do jogo -->
+    <div
+      class="modal fade"
+      id="gameModal"
+      tabindex="-1"
+      aria-labelledby="gameModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark text-white">
+          <div class="modal-header">
+            <h5 class="modal-title" id="gameModalLabel"></h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Fechar"
+            ></button>
+          </div>
+          <div class="modal-body text-center">
+            <img id="gameModalImg" class="img-fluid mb-3" src="" alt="" />
+            <p id="gameModalProvider" class="mb-2"></p>
+            <div class="d-flex justify-content-center gap-3">
+              <div>
+                <strong id="gameModalDaily"></strong>
+                <span id="gameModalDailyBadge"></span>
+              </div>
+              <div>
+                <strong id="gameModalWeekly"></strong>
+                <span id="gameModalWeeklyBadge"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Modal único de vencedores -->
     <div
       class="modal fade modal-draggable"
