@@ -1,5 +1,4 @@
 import os
-
 import urllib3
 from flask import Flask, jsonify, render_template
 
@@ -51,7 +50,7 @@ def get_protobuf_message():
     game.field.add(name="provider", number=3, type=11, type_name=".rtp.Game.Provider")
     game.field.add(name="image", number=4, type=9)
     game.field.add(name="rtp", number=5, type=5)
-    game.field.add(name="extra", number=6, type=4)  # campo adicional tratado
+    game.field.add(name="extra", number=6, type=4)
 
     response = proto_schema.message_type.add()
     response.name = "Response"
@@ -127,11 +126,14 @@ def games():
         game["extra_semana"] = (
             decode_signed(int(week["extra"])) if week and week.get("extra") else None
         )
-        game["status_semana"] = (
-            "down"
-            if game["extra_semana"] < 0
-            else "up" if game["extra_semana"] else "neutral"
-        )
+
+        # 🚀 Aqui está o bloco corrigido
+        if game["extra_semana"] is None:
+            game["status_semana"] = "neutral"
+        elif game["extra_semana"] < 0:
+            game["status_semana"] = "down"
+        else:
+            game["status_semana"] = "up"
 
     if DEBUG_REQUESTS:
         print("[DEBUG] <<< Mensagem Decodificada (JSON) >>>")
