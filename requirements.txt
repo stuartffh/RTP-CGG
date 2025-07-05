@@ -2,3 +2,5 @@ flask
 requests
 protobuf
 gunicorn
+flask-socketio
+eventlet
