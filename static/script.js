@@ -169,5 +169,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('min-rtp')?.addEventListener('input', debounce(filterAndRender, 300));
     document.getElementById('max-rtp')?.addEventListener('input', debounce(filterAndRender, 300));
     fetchGames(true);
-    setInterval(() => fetchGames(false), 5000);
+    setInterval(() => fetchGames(false), 1000);
 });
