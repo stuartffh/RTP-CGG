@@ -98,8 +98,23 @@ function renderAlerts() {
     });
 }
 
+function applyPriorities(games) {
+    const sorted = [...games].sort((a, b) => (a.extra ?? 0) - (b.extra ?? 0));
+    sorted.forEach(g => {
+        const val = g.extra ?? 0;
+        if (val <= -200) {
+            g.prioridade = '🔥 Alta prioridade';
+        } else if (val < 0) {
+            g.prioridade = '⚠️ Média prioridade';
+        } else {
+            g.prioridade = '✅ Neutra ou positiva';
+        }
+    });
+    return sorted;
+}
+
 function handleGamesData(data) {
-    gamesData = data;
+    gamesData = window.IS_MELHORES_PAGE ? applyPriorities(data) : data;
     alerts.forEach(alert => {
         const game = gamesData.find(
             g => g.name.toLowerCase() === alert.name.toLowerCase(),
@@ -154,6 +169,7 @@ async function fetchGames(showSpinner = false) {
     }
 }
 
+
 async function fetchMelhores(showSpinner = false) {
     const spinner = document.getElementById('loading-spinner');
     const statusEl = document.getElementById('status-message');
@@ -177,6 +193,7 @@ async function fetchMelhores(showSpinner = false) {
         if (spinner && showSpinner) spinner.classList.add('d-none');
     }
 }
+
 async function fetchWinners() {
     try {
         const res = await fetch("/api/last-winners");
