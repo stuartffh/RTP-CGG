@@ -201,7 +201,7 @@ def cached_image(game_id):
     response = send_file(
         file_path,
         mimetype="image/webp",
-        cache_timeout=86400,
+        max_age=86400,
     )
     response.headers["Cache-Control"] = "public, max-age=86400"
     return response
