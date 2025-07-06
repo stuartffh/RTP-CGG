@@ -540,7 +540,7 @@ document.addEventListener('click', async (e) => {
             }
             await fetchWinners();
             winnersModal?.show();
-            winnersInterval = setInterval(fetchWinners, 1000);
+            winnersInterval = setInterval(fetchWinners, 3000);
         } else {
             clearInterval(winnersInterval);
             winnersInterval = null;

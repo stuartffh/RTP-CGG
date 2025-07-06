@@ -220,7 +220,7 @@ def background_fetch():
             latest_games = fetch_games_data()
             socketio.emit("games_update", latest_games)
         finally:
-            socketio.sleep(1)
+            socketio.sleep(3)
 
 
 @app.route("/api/last-winners")
