@@ -167,11 +167,13 @@ def cached_image(game_id):
                 img_file.write(resp.content)
         except requests.RequestException:
             abort(404)
-    response = send_file(file_path, mimetype="image/webp")
+    response = send_file(
+        file_path,
+        mimetype="image/webp",
+        cache_timeout=86400,
+    )
     response.headers["Cache-Control"] = "public, max-age=86400"
     return response
-
-    return send_file(file_path, mimetype="image/webp", cache_timeout=86400)
 
 
 @socketio.on("connect")
