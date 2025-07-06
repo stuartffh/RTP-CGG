@@ -98,8 +98,23 @@ function renderAlerts() {
     });
 }
 
+function applyPriorities(games) {
+    const sorted = [...games].sort((a, b) => (a.extra ?? 0) - (b.extra ?? 0));
+    sorted.forEach(g => {
+        const val = g.extra ?? 0;
+        if (val <= -200) {
+            g.prioridade = '🔥 Alta prioridade';
+        } else if (val < 0) {
+            g.prioridade = '⚠️ Média prioridade';
+        } else {
+            g.prioridade = '✅ Neutra ou positiva';
+        }
+    });
+    return sorted;
+}
+
 function handleGamesData(data) {
-    gamesData = data;
+    gamesData = window.IS_MELHORES_PAGE ? applyPriorities(data) : data;
     alerts.forEach(alert => {
         const game = gamesData.find(
             g => g.name.toLowerCase() === alert.name.toLowerCase(),
@@ -153,6 +168,7 @@ async function fetchGames(showSpinner = false) {
         if (spinner && showSpinner) spinner.classList.add('d-none');
     }
 }
+
 async function fetchWinners() {
     try {
         const res = await fetch("/api/last-winners");
@@ -278,6 +294,10 @@ function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
     provider.className = 'card-text mb-1';
     provider.textContent = `Provedor: ${game.provider.name}`;
 
+    const prioridade = document.createElement('p');
+    prioridade.className = 'mb-1';
+    prioridade.textContent = game.prioridade || '';
+
     const rtpContainer = document.createElement('div');
     rtpContainer.className = 'rtp-container';
 
@@ -304,6 +324,7 @@ function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
 
     body.appendChild(title);
     body.appendChild(provider);
+    if (game.prioridade) body.appendChild(prioridade);
     body.appendChild(rtpContainer);
 
     card.appendChild(img);
@@ -315,6 +336,7 @@ function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
         img,
         title,
         provider,
+        prioridade,
         dailyStrong,
         dailyBadgeDiv,
         weeklyStrong,
@@ -361,6 +383,7 @@ function displayGames(games) {
                 img,
                 title,
                 provider,
+                prioridade,
                 dailyStrong,
                 dailyBadgeDiv,
                 weeklyStrong,
@@ -372,6 +395,8 @@ function displayGames(games) {
             img.alt = `Imagem de ${game.name}`;
             title.textContent = game.name;
             provider.textContent = `Provedor: ${game.provider.name}`;
+            if (prioridade)
+                prioridade.textContent = game.prioridade || '';
             dailyStrong.textContent = `${(game.rtp / 100).toFixed(2)}%`;
             dailyBadgeDiv.innerHTML = dailyBadge;
             const weeklyValue = game.rtp_semana ?? null;
