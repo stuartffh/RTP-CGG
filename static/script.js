@@ -153,6 +153,30 @@ async function fetchGames(showSpinner = false) {
         if (spinner && showSpinner) spinner.classList.add('d-none');
     }
 }
+
+async function fetchMelhores(showSpinner = false) {
+    const spinner = document.getElementById('loading-spinner');
+    const statusEl = document.getElementById('status-message');
+
+    try {
+        if (spinner && showSpinner) spinner.classList.remove('d-none');
+        const response = await fetch('/api/melhores');
+        if (!response.ok) throw new Error('Erro na resposta da rede');
+        const data = await response.json();
+        handleGamesData(data);
+    } catch (error) {
+        console.error('Erro ao buscar jogos:', error);
+        const message = 'Não foi possível carregar os jogos. Tente novamente.';
+        if (statusEl) {
+            statusEl.textContent = message;
+            statusEl.classList.remove('d-none');
+        } else {
+            alert(message);
+        }
+    } finally {
+        if (spinner && showSpinner) spinner.classList.add('d-none');
+    }
+}
 async function fetchWinners() {
     try {
         const res = await fetch("/api/last-winners");
@@ -278,6 +302,10 @@ function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
     provider.className = 'card-text mb-1';
     provider.textContent = `Provedor: ${game.provider.name}`;
 
+    const prioridade = document.createElement('p');
+    prioridade.className = 'mb-1';
+    prioridade.textContent = game.prioridade || '';
+
     const rtpContainer = document.createElement('div');
     rtpContainer.className = 'rtp-container';
 
@@ -304,6 +332,7 @@ function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
 
     body.appendChild(title);
     body.appendChild(provider);
+    if (game.prioridade) body.appendChild(prioridade);
     body.appendChild(rtpContainer);
 
     card.appendChild(img);
@@ -315,6 +344,7 @@ function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
         img,
         title,
         provider,
+        prioridade,
         dailyStrong,
         dailyBadgeDiv,
         weeklyStrong,
@@ -361,6 +391,7 @@ function displayGames(games) {
                 img,
                 title,
                 provider,
+                prioridade,
                 dailyStrong,
                 dailyBadgeDiv,
                 weeklyStrong,
@@ -372,6 +403,8 @@ function displayGames(games) {
             img.alt = `Imagem de ${game.name}`;
             title.textContent = game.name;
             provider.textContent = `Provedor: ${game.provider.name}`;
+            if (prioridade)
+                prioridade.textContent = game.prioridade || '';
             dailyStrong.textContent = `${(game.rtp / 100).toFixed(2)}%`;
             dailyBadgeDiv.innerHTML = dailyBadge;
             const weeklyValue = game.rtp_semana ?? null;
@@ -518,4 +551,8 @@ document.addEventListener('click', async (e) => {
 
     loadAlerts();
     renderAlerts();
-    connectSocket();
+    if (window.USE_MELHORES_API) {
+        fetchMelhores(true);
+    } else {
+        connectSocket();
+    }
