@@ -169,6 +169,31 @@ async function fetchGames(showSpinner = false) {
     }
 }
 
+
+async function fetchMelhores(showSpinner = false) {
+    const spinner = document.getElementById('loading-spinner');
+    const statusEl = document.getElementById('status-message');
+
+    try {
+        if (spinner && showSpinner) spinner.classList.remove('d-none');
+        const response = await fetch('/api/melhores');
+        if (!response.ok) throw new Error('Erro na resposta da rede');
+        const data = await response.json();
+        handleGamesData(data);
+    } catch (error) {
+        console.error('Erro ao buscar jogos:', error);
+        const message = 'Não foi possível carregar os jogos. Tente novamente.';
+        if (statusEl) {
+            statusEl.textContent = message;
+            statusEl.classList.remove('d-none');
+        } else {
+            alert(message);
+        }
+    } finally {
+        if (spinner && showSpinner) spinner.classList.add('d-none');
+    }
+}
+
 async function fetchWinners() {
     try {
         const res = await fetch("/api/last-winners");
@@ -543,4 +568,8 @@ document.addEventListener('click', async (e) => {
 
     loadAlerts();
     renderAlerts();
-    connectSocket();
+    if (window.USE_MELHORES_API) {
+        fetchMelhores(true);
+    } else {
+        connectSocket();
+    }

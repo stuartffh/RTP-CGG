@@ -20,8 +20,14 @@ DEBUG_REQUESTS = os.environ.get("DEBUG_REQUESTS", "false").lower() in (
     "yes",
 )
 
-# Permite personalizar a verificação SSL via variável de ambiente
-VERIFY_SSL = os.environ.get("VERIFY_SSL", "false").lower() not in ("false", "0", "no")
+# Permite personalizar a verificação SSL via variável de ambiente.
+# A verificação é habilitada por padrão e só é desativada quando
+# `VERIFY_SSL=false` é definido explicitamente.
+VERIFY_SSL = os.environ.get("VERIFY_SSL", "true").lower() not in (
+    "false",
+    "0",
+    "no",
+)
 
 url = "https://cgg.bet.br/casinogo/widgets/v2/live-rtp"
 headers = {
@@ -192,11 +198,13 @@ def cached_image(game_id):
                 img_file.write(resp.content)
         except requests.RequestException:
             abort(404)
-    response = send_file(file_path, mimetype="image/webp")
+    response = send_file(
+        file_path,
+        mimetype="image/webp",
+        cache_timeout=86400,
+    )
     response.headers["Cache-Control"] = "public, max-age=86400"
     return response
-
-    return send_file(file_path, mimetype="image/webp", cache_timeout=86400)
 
 
 @socketio.on("connect")
@@ -254,7 +262,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument(
-        "--insecure", action="store_false", help="Desativa verificação SSL"
+        "--insecure", action="store_true", help="Desativa verificação SSL"
     )
     args, _ = parser.parse_known_args()
     if args.insecure:
