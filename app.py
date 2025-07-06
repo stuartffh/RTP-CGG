@@ -80,6 +80,19 @@ def decode_signed(value):
     return value
 
 
+def prioritize_games(games):
+    sorted_games = sorted(games, key=lambda g: g.get("extra", 0))
+    for game in sorted_games:
+        extra_val = game.get("extra", 0)
+        if extra_val <= -200:
+            game["prioridade"] = "🔥 Alta prioridade"
+        elif extra_val < 0:
+            game["prioridade"] = "⚠️ Média prioridade"
+        else:
+            game["prioridade"] = "✅ Neutra ou positiva"
+    return sorted_games
+
+
 def fetch_games_data():
     if DEBUG_REQUESTS:
         print("\n[DEBUG] >>> Enviando Requisição <<<")
@@ -148,11 +161,23 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/melhores")
+def melhores():
+    return render_template("melhores.html")
+
+
 @app.route("/api/games")
 def games():
     global latest_games
     latest_games = fetch_games_data()
     return jsonify(latest_games)
+
+
+@app.route("/api/melhores")
+def api_melhores():
+    global latest_games
+    latest_games = fetch_games_data()
+    return jsonify(prioritize_games(latest_games))
 
 
 @app.route("/imagens/<int:game_id>.webp")
