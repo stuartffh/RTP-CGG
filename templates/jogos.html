@@ -32,6 +32,9 @@
     {% if modo == 'melhores' %}
     window.IS_MELHORES_PAGE = true;
     {% endif %}
+    if (!localStorage.getItem('token')) {
+      window.location.href = '/login';
+    }
   </script>
 </head>
 <body>

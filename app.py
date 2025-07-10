@@ -9,6 +9,7 @@ from flask_jwt_extended import (
     create_access_token,
     jwt_required,
     get_jwt_identity,
+    verify_jwt_in_request,
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -73,6 +74,13 @@ class User(db.Model):
 
 with app.app_context():
     db.create_all()
+    admin_user = os.environ.get("ADMIN_USERNAME", "admin")
+    admin_pass = os.environ.get("ADMIN_PASSWORD", "admin")
+    if not User.query.filter_by(username=admin_user).first():
+        user = User(username=admin_user)
+        user.set_password(admin_pass)
+        db.session.add(user)
+        db.session.commit()
 
 
 def get_protobuf_message():
@@ -220,6 +228,7 @@ def melhores():
 
 
 @app.route("/api/games")
+@jwt_required()
 def games():
     global latest_games
     try:
@@ -230,6 +239,7 @@ def games():
 
 
 @app.route("/api/melhores")
+@jwt_required()
 def api_melhores():
     global latest_games
     try:
@@ -262,6 +272,10 @@ def cached_image(game_id):
 
 @socketio.on("connect")
 def handle_connect():
+    try:
+        verify_jwt_in_request(locations=["query_string", "headers"])
+    except Exception:
+        return False
     if latest_games:
         emit("games_update", latest_games)
 
@@ -281,6 +295,7 @@ def background_fetch():
 
 
 @app.route("/api/last-winners")
+@jwt_required()
 def last_winners():
     winners_url = "https://cbet.gg/casinogo/widgets/last-winners"
     winners_headers = headers.copy()

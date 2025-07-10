@@ -24,6 +24,11 @@
     src="{{ url_for('static', filename='script.js') }}"
     defer
   ></script>
+  <script>
+    if (!localStorage.getItem('token')) {
+      window.location.href = '/login';
+    }
+  </script>
 </head>
 <body>
   <div class="container-fluid">
