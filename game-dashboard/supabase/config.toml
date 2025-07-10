@@ -1,0 +1,10 @@
+project_id = "pzcipopufvmixwqbjymt"
+
+[functions.fetch-games]
+verify_jwt = false
+
+[functions.fetch-winners]
+verify_jwt = false
+
+[functions.admin-api]
+verify_jwt = true
