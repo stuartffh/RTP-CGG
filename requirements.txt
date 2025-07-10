@@ -4,3 +4,5 @@ protobuf
 gunicorn
 flask-socketio
 eventlet
+flask_sqlalchemy
+flask_jwt_extended

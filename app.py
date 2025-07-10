@@ -1,8 +1,16 @@
 import os
 import urllib3
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
 from flask import send_file, abort
+from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import (
+    JWTManager,
+    create_access_token,
+    jwt_required,
+    get_jwt_identity,
+)
+from werkzeug.security import generate_password_hash, check_password_hash
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import requests
@@ -12,7 +20,13 @@ from google.protobuf.descriptor_pool import DescriptorPool
 from google.protobuf.json_format import MessageToDict
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///app.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "changeme")
+
 socketio = SocketIO(app, cors_allowed_origins="*")
+db = SQLAlchemy(app)
+jwt = JWTManager(app)
 
 DEBUG_REQUESTS = os.environ.get("DEBUG_REQUESTS", "false").lower() in (
     "1",
@@ -42,6 +56,23 @@ data_weekly = b"\x08\x02\x10\x02"
 
 IMAGE_CACHE_DIR = "image_cache"
 os.makedirs(IMAGE_CACHE_DIR, exist_ok=True)
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
+    ip_liberado = db.Column(db.String(200))
+
+    def set_password(self, password: str) -> None:
+        self.password_hash = generate_password_hash(password)
+
+    def check_password(self, password: str) -> bool:
+        return check_password_hash(self.password_hash, password)
+
+
+with app.app_context():
+    db.create_all()
 
 
 def get_protobuf_message():
@@ -255,6 +286,78 @@ def last_winners():
             jsonify({"erro": "Falha ao buscar últimos vencedores"}),
             500,
         )
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        data = request.get_json() or request.form
+        username = data.get("username")
+        password = data.get("password")
+        if not username or not password:
+            return jsonify({"erro": "Credenciais inválidas"}), 400
+        user = User.query.filter_by(username=username).first()
+        if not user or not user.check_password(password):
+            return jsonify({"erro": "Usuário ou senha incorretos"}), 401
+        if user.ip_liberado:
+            ips = [ip.strip() for ip in user.ip_liberado.split(",") if ip.strip()]
+            if request.remote_addr not in ips:
+                return jsonify({"erro": "IP não autorizado"}), 403
+        token = create_access_token(identity=user.id)
+        return jsonify({"access_token": token})
+    return render_template("login.html")
+
+
+@app.route("/admin")
+@jwt_required()
+def admin():
+    return render_template("admin.html")
+
+
+@app.route("/api/users", methods=["GET", "POST"])
+@jwt_required()
+def users_api():
+    if request.method == "POST":
+        data = request.get_json() or {}
+        username = data.get("username")
+        password = data.get("password")
+        if not username or not password:
+            return (
+                jsonify({"erro": "Usuário e senha são obrigatórios"}),
+                400,
+            )
+        if User.query.filter_by(username=username).first():
+            return jsonify({"erro": "Usuário já existe"}), 400
+        user = User(username=username, ip_liberado=data.get("ip_liberado", ""))
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({"id": user.id}), 201
+
+    users = [
+        {"id": u.id, "username": u.username, "ip_liberado": u.ip_liberado or ""}
+        for u in User.query.all()
+    ]
+    return jsonify(users)
+
+
+@app.route("/api/users/<int:user_id>", methods=["PUT", "DELETE"])
+@jwt_required()
+def user_detail(user_id: int):
+    user = User.query.get_or_404(user_id)
+    if request.method == "PUT":
+        data = request.get_json() or {}
+        if "username" in data:
+            user.username = data["username"]
+        if data.get("password"):
+            user.set_password(data["password"])
+        if "ip_liberado" in data:
+            user.ip_liberado = data["ip_liberado"]
+        db.session.commit()
+        return jsonify({"status": "atualizado"})
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({"status": "excluido"})
 
 
 if __name__ == "__main__":
