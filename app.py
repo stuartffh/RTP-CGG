@@ -1,8 +1,14 @@
 import os
 import urllib3
-from flask import Flask, jsonify, render_template, request
+from flask import (
+    Flask,
+    jsonify,
+    request,
+    send_file,
+    send_from_directory,
+    abort,
+)
 from flask_socketio import SocketIO, emit
-from flask import send_file, abort
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import (
     JWTManager,
@@ -217,14 +223,17 @@ def fetch_games_data():
     return games
 
 
+BUILD_DIR = os.path.join(os.path.dirname(__file__), "game-dashboard", "dist")
+
+
 @app.route("/")
 def index():
-    return render_template("jogos.html", modo="tempo_real")
+    return send_from_directory(BUILD_DIR, "index.html")
 
 
 @app.route("/melhores")
 def melhores():
-    return render_template("jogos.html", modo="melhores")
+    return send_from_directory(BUILD_DIR, "index.html")
 
 
 @app.route("/api/games")
@@ -329,30 +338,32 @@ def last_winners():
         )
 
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/login", methods=["POST"])
 def login():
-    if request.method == "POST":
-        data = request.get_json() or request.form
-        username = data.get("username")
-        password = data.get("password")
-        if not username or not password:
-            return jsonify({"erro": "Credenciais inválidas"}), 400
-        user = User.query.filter_by(username=username).first()
-        if not user or not user.check_password(password):
-            return jsonify({"erro": "Usuário ou senha incorretos"}), 401
-        if user.ip_liberado:
-            ips = [ip.strip() for ip in user.ip_liberado.split(",") if ip.strip()]
-            if request.remote_addr not in ips:
-                return jsonify({"erro": "IP não autorizado"}), 403
-        token = create_access_token(identity=user.id)
-        return jsonify({"access_token": token})
-    return render_template("login.html")
+    data = request.get_json() or request.form
+    username = data.get("username")
+    password = data.get("password")
+    if not username or not password:
+        return jsonify({"erro": "Credenciais inválidas"}), 400
+    user = User.query.filter_by(username=username).first()
+    if not user or not user.check_password(password):
+        return jsonify({"erro": "Usuário ou senha incorretos"}), 401
+    if user.ip_liberado:
+        ips = [ip.strip() for ip in user.ip_liberado.split(",") if ip.strip()]
+        if request.remote_addr not in ips:
+            return jsonify({"erro": "IP não autorizado"}), 403
+    token = create_access_token(identity=user.id)
+    return jsonify({"access_token": token})
+
+
+@app.route("/auth")
+def auth_page():
+    return send_from_directory(BUILD_DIR, "index.html")
 
 
 @app.route("/admin")
-@jwt_required()
 def admin():
-    return render_template("admin.html")
+    return send_from_directory(BUILD_DIR, "index.html")
 
 
 @app.route("/api/users", methods=["GET", "POST"])
@@ -399,6 +410,14 @@ def user_detail(user_id: int):
     db.session.delete(user)
     db.session.commit()
     return jsonify({"status": "excluido"})
+
+
+@app.route("/<path:path>")
+def serve_react_app(path: str):
+    target = os.path.join(BUILD_DIR, path)
+    if os.path.exists(target):
+        return send_from_directory(BUILD_DIR, path)
+    return send_from_directory(BUILD_DIR, "index.html")
 
 
 if __name__ == "__main__":

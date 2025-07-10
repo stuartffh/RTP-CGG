@@ -1,3 +1,5 @@
 __pycache__/
 image_cache/
 venv/
+game-dashboard/dist/
+game-dashboard/node_modules/

@@ -23,6 +23,20 @@ Aplicação Flask que consulta o endpoint `https://cgg.bet.br` e exibe em tempo 
    ```
    O serviço ficará disponível em `http://localhost:5000`.
 
+### Dashboard React
+
+O frontend foi migrado para React e está localizado em `game-dashboard`.
+Para compilar os arquivos de produção:
+
+```bash
+cd game-dashboard
+npm install
+npm run build
+```
+
+Após a construção, o Flask servirá automaticamente o conteúdo da pasta
+`game-dashboard/dist`.
+
 ### Utilizando Docker
 
 1. Construa a imagem:
