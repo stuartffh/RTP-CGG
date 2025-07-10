@@ -37,6 +37,12 @@ Aplicação Flask que consulta o endpoint `https://cgg.bet.br` e exibe em tempo 
 
 Esse mesmo Dockerfile funciona em plataformas como o **EasyPanel**, bastando informar a variável `PORT` caso a hospedagem utilize outra porta padrão.
 
+## Usuário padrão
+
+Ao iniciar a aplicação, é criado automaticamente um usuário administrador.
+As credenciais padrão podem ser definidas pelas variáveis de ambiente
+`ADMIN_USERNAME` e `ADMIN_PASSWORD` (padrão `admin` / `admin`).
+
 ## Scripts disponíveis
 
 - `app.py` – servidor Flask principal.
