@@ -10,6 +10,7 @@ let gameModal;
 let modalGameId = null;
 let socket;
 const IMAGE_ENDPOINT = '/imagens';
+const API_ENDPOINT = window.USE_MELHORES_API ? '/api/melhores' : '/api/games';
 
 function setupWinnersModal() {
     const modalEl = document.getElementById('winnersModal');
@@ -150,7 +151,7 @@ async function fetchGames(showSpinner = false) {
 
     try {
         if (spinner && showSpinner) spinner.classList.remove('d-none');
-        const response = await fetch('/api/games');
+        const response = await fetch(API_ENDPOINT);
         if (!response.ok) throw new Error('Erro na resposta da rede');
 
         const data = await response.json();
@@ -569,7 +570,7 @@ document.addEventListener('click', async (e) => {
     loadAlerts();
     renderAlerts();
     if (window.USE_MELHORES_API) {
-        fetchMelhores(true);
+        fetchGames(true);
     } else {
         connectSocket();
     }

@@ -195,12 +195,12 @@ def fetch_games_data():
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("jogos.html", modo="tempo_real")
 
 
 @app.route("/melhores")
 def melhores():
-    return render_template("melhores.html")
+    return render_template("jogos.html", modo="melhores")
 
 
 @app.route("/api/games")
