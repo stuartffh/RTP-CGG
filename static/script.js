@@ -12,6 +12,11 @@ let socket;
 const IMAGE_ENDPOINT = '/imagens';
 const API_ENDPOINT = window.USE_MELHORES_API ? '/api/melhores' : '/api/games';
 
+function authHeaders() {
+    const token = localStorage.getItem('token');
+    return token ? { Authorization: 'Bearer ' + token } : {};
+}
+
 function setupWinnersModal() {
     const modalEl = document.getElementById('winnersModal');
     if (!modalEl) return;
@@ -150,7 +155,11 @@ async function fetchGames(showSpinner = false) {
 
     try {
         if (spinner && showSpinner) spinner.classList.remove('d-none');
-        const response = await fetch(API_ENDPOINT);
+        const response = await fetch(API_ENDPOINT, { headers: authHeaders() });
+        if (response.status === 401) {
+            window.location.href = '/login';
+            return;
+        }
         if (!response.ok) throw new Error('Erro na resposta da rede');
 
         const data = await response.json();
@@ -176,7 +185,11 @@ async function fetchMelhores(showSpinner = false) {
 
     try {
         if (spinner && showSpinner) spinner.classList.remove('d-none');
-        const response = await fetch('/api/melhores');
+        const response = await fetch('/api/melhores', { headers: authHeaders() });
+        if (response.status === 401) {
+            window.location.href = '/login';
+            return;
+        }
         if (!response.ok) throw new Error('Erro na resposta da rede');
         const data = await response.json();
         handleGamesData(data);
@@ -196,7 +209,11 @@ async function fetchMelhores(showSpinner = false) {
 
 async function fetchWinners() {
     try {
-        const res = await fetch("/api/last-winners");
+        const res = await fetch("/api/last-winners", { headers: authHeaders() });
+        if (res.status === 401) {
+            window.location.href = '/login';
+            return;
+        }
         if (!res.ok) throw new Error("Falha na rede");
         const data = await res.json();
         const winners = Array.isArray(data) ? data : data.items || [];
@@ -223,8 +240,10 @@ async function fetchWinners() {
 }
 
 function connectSocket() {
-    socket = io();
+    const token = localStorage.getItem('token');
+    socket = io({ auth: { token } });
     socket.on('games_update', data => handleGamesData(data));
+    socket.on('connect_error', () => { window.location.href = '/login'; });
 }
 
 
@@ -568,8 +587,7 @@ document.addEventListener('click', async (e) => {
 
     loadAlerts();
     renderAlerts();
+    connectSocket();
     if (window.USE_MELHORES_API) {
         fetchGames(true);
-    } else {
-        connectSocket();
     }
