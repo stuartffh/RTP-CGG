@@ -138,15 +138,31 @@ def fetch_games_data():
         print(f"[DEBUG] Data (bytes): {data}")
         print(f"[DEBUG] SSL Verify: {VERIFY_SSL}")
 
-    response = requests.post(url, headers=headers, data=data, verify=VERIFY_SSL)
+    try:
+        response = requests.post(
+            url, headers=headers, data=data, verify=VERIFY_SSL, timeout=10
+        )
+        response.raise_for_status()
+    except requests.RequestException as exc:
+        if DEBUG_REQUESTS:
+            print("[DEBUG] Erro ao buscar jogos diários")
+            print(exc)
+        raise
 
     if DEBUG_REQUESTS:
         print("\n[DEBUG] >>> Enviando Requisição Semanal <<<")
         print(f"[DEBUG] Data Semanal (bytes): {data_weekly}")
 
-    response_weekly = requests.post(
-        url, headers=headers, data=data_weekly, verify=VERIFY_SSL
-    )
+    try:
+        response_weekly = requests.post(
+            url, headers=headers, data=data_weekly, verify=VERIFY_SSL, timeout=10
+        )
+        response_weekly.raise_for_status()
+    except requests.RequestException as exc:
+        if DEBUG_REQUESTS:
+            print("[DEBUG] Erro ao buscar jogos semanais")
+            print(exc)
+        raise
 
     if DEBUG_REQUESTS:
         print("\n[DEBUG] <<< Recebendo Resposta >>>")
@@ -206,15 +222,21 @@ def melhores():
 @app.route("/api/games")
 def games():
     global latest_games
-    latest_games = fetch_games_data()
-    return jsonify(latest_games)
+    try:
+        latest_games = fetch_games_data()
+        return jsonify(latest_games)
+    except requests.RequestException:
+        return jsonify({"erro": "Falha ao buscar jogos"}), 500
 
 
 @app.route("/api/melhores")
 def api_melhores():
     global latest_games
-    latest_games = fetch_games_data()
-    return jsonify(prioritize_games(latest_games))
+    try:
+        latest_games = fetch_games_data()
+        return jsonify(prioritize_games(latest_games))
+    except requests.RequestException:
+        return jsonify({"erro": "Falha ao buscar jogos"}), 500
 
 
 @app.route("/imagens/<int:game_id>.webp")
@@ -250,6 +272,10 @@ def background_fetch():
             global latest_games
             latest_games = fetch_games_data()
             socketio.emit("games_update", latest_games)
+        except requests.RequestException as exc:
+            if DEBUG_REQUESTS:
+                print("[DEBUG] Erro na atualização em segundo plano")
+                print(exc)
         finally:
             socketio.sleep(3)
 
