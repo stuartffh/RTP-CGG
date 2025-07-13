@@ -201,6 +201,11 @@ body {
   text-shadow: 0 0 5px rgba(0,255,180,0.4);
 }
 
+.unidades {
+  font-size: 0.9rem;
+  color: #bbb;
+}
+
 /* Modal drag */
 .modal-draggable .modal-content {
   resize: both;

@@ -48,6 +48,15 @@
         <div id="games-container" class="games-grid"></div>
         <div id="copy-toast" aria-live="polite"></div>
         <audio id="alert-sound" preload="auto"></audio>
+        <div class="bg-dark text-light p-3 rounded mt-4">
+          <h5>Como interpretar as unidades</h5>
+          <p class="mb-0">
+            É totalmente possível descobrir o valor real (negativo) a partir dos
+            números gigantes do tipo <em>Signed</em> usando a conversão de
+            <code>uint64</code> para <code>int64</code>:
+            <code>valor_real = n &gt; 2^63 - 1 ? n - 2^64 : n</code>.
+          </p>
+        </div>
       </main>
     </div>
   </div>

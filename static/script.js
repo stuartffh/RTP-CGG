@@ -323,6 +323,11 @@ function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
     prioridade.className = 'mb-1';
     prioridade.textContent = game.prioridade || '';
 
+    const unidades = document.createElement('p');
+    unidades.className = 'mb-1 unidades';
+    unidades.textContent =
+        typeof game.extra === 'number' ? `Unidades: ${game.extra}` : '';
+
     const rtpContainer = document.createElement('div');
     rtpContainer.className = 'rtp-container';
 
@@ -350,6 +355,7 @@ function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
     body.appendChild(title);
     body.appendChild(provider);
     if (game.prioridade) body.appendChild(prioridade);
+    if (unidades.textContent) body.appendChild(unidades);
     body.appendChild(rtpContainer);
 
     card.appendChild(img);
@@ -362,6 +368,7 @@ function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
         title,
         provider,
         prioridade,
+        unidades,
         dailyStrong,
         dailyBadgeDiv,
         weeklyStrong,
@@ -409,6 +416,7 @@ function displayGames(games) {
                 title,
                 provider,
                 prioridade,
+                unidades,
                 dailyStrong,
                 dailyBadgeDiv,
                 weeklyStrong,
@@ -422,6 +430,11 @@ function displayGames(games) {
             provider.textContent = `Provedor: ${game.provider.name}`;
             if (prioridade)
                 prioridade.textContent = game.prioridade || '';
+            if (unidades)
+                unidades.textContent =
+                    typeof game.extra === 'number'
+                        ? `Unidades: ${game.extra}`
+                        : '';
             dailyStrong.textContent = `${(game.rtp / 100).toFixed(2)}%`;
             dailyBadgeDiv.innerHTML = dailyBadge;
             const weeklyValue = game.rtp_semana ?? null;
