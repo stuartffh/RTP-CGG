@@ -1,6 +1,6 @@
 import os
 import urllib3
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
 from flask import send_file, abort
 
@@ -30,6 +30,7 @@ VERIFY_SSL = os.environ.get("VERIFY_SSL", "true").lower() not in (
 )
 
 url = "https://cbet.gg/casinogo/widgets/v2/live-rtp"
+search_url = "https://cbet.gg/casinogo/widgets/v2/live-rtp/search"
 headers = {
     "accept": "application/x-protobuf",
     "content-type": "application/x-protobuf",
@@ -162,6 +163,48 @@ def fetch_games_data():
     return games
 
 
+def fetch_games_by_name(names: list[str]):
+    results = []
+    for name in names:
+        body = b"\x02\x10\x19\x12" + len(name).to_bytes(1, "little") + name.encode()
+
+        if DEBUG_REQUESTS:
+            print("\n[DEBUG] >>> Enviando Busca RTP <<<")
+            print(f"[DEBUG] URL: {search_url}")
+            print(f"[DEBUG] Nome: {name}")
+            print(f"[DEBUG] Headers: {headers}")
+            print(f"[DEBUG] Data (bytes): {body}")
+            print(f"[DEBUG] SSL Verify: {VERIFY_SSL}")
+
+        try:
+            resp = requests.post(
+                search_url, headers=headers, data=body, verify=VERIFY_SSL
+            )
+            resp.raise_for_status()
+
+            decoded = ProtobufMessage()
+            decoded.ParseFromString(resp.content)
+            games = MessageToDict(decoded).get("games", [])
+            for game in games:
+                extra = game.get("extra")
+                if extra is not None:
+                    game["extra"] = decode_signed(int(extra))
+                    game["rtp_status"] = "down" if game["extra"] < 0 else "up"
+                else:
+                    game["rtp_status"] = "neutral"
+            results.extend(games)
+
+            if DEBUG_REQUESTS:
+                print("[DEBUG] <<< Resposta Busca RTP >>>")
+                print(f"[DEBUG] Status Code: {resp.status_code}")
+                print(f"[DEBUG] Conteúdo JSON: {games}\n")
+        except requests.RequestException as exc:
+            if DEBUG_REQUESTS:
+                print("[DEBUG] Erro na busca RTP")
+                print(exc)
+    return results
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -184,6 +227,18 @@ def api_melhores():
     global latest_games
     latest_games = fetch_games_data()
     return jsonify(prioritize_games(latest_games))
+
+
+@app.route("/api/search-rtp", methods=["POST"])
+def api_search_rtp():
+    try:
+        names = request.get_json(force=True).get("names", [])
+        if not isinstance(names, list):
+            return jsonify([])
+        games = fetch_games_by_name([str(n) for n in names])
+        return jsonify(games)
+    except Exception:
+        return jsonify([])
 
 
 @app.route("/imagens/<int:game_id>.webp")
