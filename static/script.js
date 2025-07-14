@@ -9,6 +9,11 @@ let winnersModal;
 let gameModal;
 let modalGameId = null;
 let socket;
+let socketGames = [];
+let searchInterval = null;
+let isSearching = false;
+let currentQuery = '';
+let modalInterval = null;
 const IMAGE_ENDPOINT = '/imagens';
 
 function setupWinnersModal() {
@@ -114,7 +119,11 @@ function applyPriorities(games) {
 }
 
 function handleGamesData(data) {
-    gamesData = window.IS_MELHORES_PAGE ? applyPriorities(data) : data;
+    const processed = window.IS_MELHORES_PAGE ? applyPriorities(data) : data;
+    socketGames = processed;
+    if (!isSearching) {
+        gamesData = processed;
+    }
     alerts.forEach(alert => {
         const game = gamesData.find(
             g => g.name.toLowerCase() === alert.name.toLowerCase(),
@@ -206,6 +215,18 @@ async function fetchRtpAtual(nome) {
     } catch (err) {
         console.error('Erro ao buscar RTP:', err);
         return [];
+    }
+}
+
+async function fetchAndDisplaySearch(query) {
+    try {
+        const dados = await fetchRtpAtual(query);
+        if (Array.isArray(dados)) {
+            gamesData = dados;
+            filterAndRender();
+        }
+    } catch (err) {
+        console.error('Erro ao atualizar RTP:', err);
     }
 }
 
@@ -303,6 +324,44 @@ function openGameModal(id) {
     if (!gameModal) return;
     fillGameModal(game);
     gameModal.show();
+    clearInterval(modalInterval);
+    modalInterval = setInterval(async () => {
+        const res = await fetchRtpAtual(game.name);
+        if (Array.isArray(res) && res.length) {
+            const updated = res[0];
+            const idx = gamesData.findIndex(g => g.id === updated.id);
+            if (idx !== -1) {
+                gamesData[idx] = updated;
+            }
+            fillGameModal(updated);
+            const cardData = gameCards.get(updated.id);
+            if (cardData) {
+                const rtpStatus = updated.rtp_status || 'neutral';
+                const dailyBadge = {
+                    down: '<span class="badge bg-danger rtp-badge">▼ Dia</span>',
+                    up: '<span class="badge bg-success rtp-badge">▲ Dia</span>',
+                    neutral: '<span class="badge bg-secondary rtp-badge">▬ Dia</span>',
+                }[rtpStatus];
+                const weeklyStatus = updated.status_semana || 'neutral';
+                const weeklyBadge = {
+                    down: '<span class="badge bg-danger rtp-badge">▼ Semana</span>',
+                    up: '<span class="badge bg-success rtp-badge">▲ Semana</span>',
+                    neutral: '<span class="badge bg-secondary rtp-badge">▬ Semana</span>',
+                }[weeklyStatus];
+                cardData.wrapper.dataset.status = rtpStatus;
+                cardData.dailyStrong.textContent = `${(updated.rtp / 100).toFixed(2)}%`;
+                cardData.dailyBadgeDiv.innerHTML = dailyBadge;
+                const weeklyValue = updated.rtp_semana ?? null;
+                cardData.weeklyStrong.textContent =
+                    weeklyValue !== null ? `${(weeklyValue / 100).toFixed(2)}%` : '--';
+                cardData.weeklyBadgeDiv.innerHTML = weeklyBadge;
+                if (cardData.unidades)
+                    cardData.unidades.textContent =
+                        typeof updated.extra === 'number' ? `Unidades: ${updated.extra}` : '';
+                if (cardData.prioridade) cardData.prioridade.textContent = updated.prioridade || '';
+            }
+        }
+    }, 1000);
 }
 
 
@@ -519,7 +578,7 @@ function filterAndRender() {
     const maxRtp = parseFloat(document.getElementById('max-rtp')?.value) || null;
 
     let filtered = gamesData.filter(game => {
-        if (query && !game.name.toLowerCase().includes(query)) return false;
+        if (!isSearching && query && !game.name.toLowerCase().includes(query)) return false;
         if (provider !== 'all' && game.provider.name !== provider) return false;
         if (game.rtp_status === 'up' && !showPos) return false;
         if (game.rtp_status === 'down' && !showNeg) return false;
@@ -534,15 +593,16 @@ function filterAndRender() {
 
 const handleSearchInput = debounce(async () => {
     const termo = document.getElementById('search-input')?.value.trim();
-    if (termo) {
-        try {
-            const dados = await fetchRtpAtual(termo);
-            if (Array.isArray(dados)) gamesData = dados;
-        } catch (err) {
-            console.error('Erro ao atualizar RTP:', err);
-        }
+    clearInterval(searchInterval);
+    isSearching = !!termo;
+    currentQuery = termo || '';
+    if (isSearching) {
+        await fetchAndDisplaySearch(currentQuery);
+        searchInterval = setInterval(() => fetchAndDisplaySearch(currentQuery), 1000);
+    } else {
+        gamesData = socketGames;
+        filterAndRender();
     }
-    filterAndRender();
 }, 300);
 
 // Copiar nome ao clicar
@@ -612,3 +672,9 @@ document.addEventListener('click', async (e) => {
     } else {
         connectSocket();
     }
+
+    document.getElementById('gameModal')?.addEventListener('hidden.bs.modal', () => {
+        clearInterval(modalInterval);
+        modalInterval = null;
+        modalGameId = null;
+    });
