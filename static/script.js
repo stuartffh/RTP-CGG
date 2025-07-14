@@ -194,6 +194,21 @@ async function fetchMelhores(showSpinner = false) {
     }
 }
 
+async function fetchRtpAtual(nome) {
+    try {
+        const resposta = await fetch('/api/search-rtp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ names: [nome] }),
+        });
+        if (!resposta.ok) throw new Error('Falha na rede');
+        return await resposta.json();
+    } catch (err) {
+        console.error('Erro ao buscar RTP:', err);
+        return [];
+    }
+}
+
 async function fetchWinners() {
     try {
         const res = await fetch("/api/last-winners");
@@ -517,7 +532,18 @@ function filterAndRender() {
     displayGames(filtered);
 }
 
-const handleSearchInput = debounce(filterAndRender, 300);
+const handleSearchInput = debounce(async () => {
+    const termo = document.getElementById('search-input')?.value.trim();
+    if (termo) {
+        try {
+            const dados = await fetchRtpAtual(termo);
+            if (Array.isArray(dados)) gamesData = dados;
+        } catch (err) {
+            console.error('Erro ao atualizar RTP:', err);
+        }
+    }
+    filterAndRender();
+}, 300);
 
 // Copiar nome ao clicar
 document.addEventListener('click', async (e) => {
