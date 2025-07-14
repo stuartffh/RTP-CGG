@@ -597,8 +597,19 @@ const handleSearchInput = debounce(async () => {
     isSearching = !!termo;
     currentQuery = termo || '';
     if (isSearching) {
-        await fetchAndDisplaySearch(currentQuery);
-        searchInterval = setInterval(() => fetchAndDisplaySearch(currentQuery), 1000);
+        const local = socketGames.filter(g =>
+            g.name.toLowerCase().includes(currentQuery.toLowerCase())
+        );
+        if (local.length) {
+            gamesData = local;
+            filterAndRender();
+        } else {
+            await fetchAndDisplaySearch(currentQuery);
+            searchInterval = setInterval(
+                () => fetchAndDisplaySearch(currentQuery),
+                1000
+            );
+        }
     } else {
         gamesData = socketGames;
         filterAndRender();
