@@ -54,6 +54,19 @@ O projeto não exige variáveis de ambiente obrigatórias, mas algumas opções 
 
 Aplicação Flask que exibe os dados de RTP de jogos em tempo real.
 
+### Buscar RTP por jogo
+
+Utilize a rota `/api/search-rtp` para obter o RTP mais atual de cada jogo
+informado na requisição:
+
+```bash
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"names":["Wisdom of Athena"]}' \
+  http://localhost:5000/api/search-rtp
+```
+
+A resposta retornará o RTP mais recente de cada título enviado.
+
 ## Verificação SSL
 Por padrão, as requisições HTTPS verificam o certificado do servidor. Para manter a segurança, **não desative** essa verificação em ambientes de produção.
 
