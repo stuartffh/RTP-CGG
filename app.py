@@ -205,6 +205,14 @@ def fetch_games_by_name(names: list[str]):
     return results
 
 
+def search_local(names: list[str]):
+    queries = [str(n).lower() for n in names]
+    global latest_games
+    if not latest_games:
+        latest_games = fetch_games_data()
+    return [g for g in latest_games if any(q in g["name"].lower() for q in queries)]
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -236,9 +244,15 @@ def api_search_rtp():
         if not isinstance(names, list):
             return jsonify([])
         games = fetch_games_by_name([str(n) for n in names])
+        if not games:
+            games = search_local(names)
         return jsonify(games)
-    except Exception:
+    except Exception as exc:
+        if DEBUG_REQUESTS:
+            print("[DEBUG] Erro no endpoint de busca")
+            print(exc)
         return jsonify([])
+
 
 def search_rtp():
     search_term = None
@@ -281,7 +295,6 @@ def search_rtp():
             print("[DEBUG] Erro na requisição de busca")
             print(exc)
         return jsonify({"erro": "Falha ao buscar jogos"}), 500
-
 
 
 @app.route("/imagens/<int:game_id>.webp")
