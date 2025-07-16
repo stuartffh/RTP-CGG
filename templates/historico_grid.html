@@ -37,6 +37,7 @@
             <th>Jogo</th>
             <th>RTP (%)</th>
             <th>Unidades</th>
+            <th>Status</th>
             <th>Provedor</th>
           </tr>
         </thead>
@@ -66,8 +67,15 @@
       for (const row of dados) {
         const tr = document.createElement('tr');
         const data = new Date(row.timestamp).toLocaleString();
-        tr.innerHTML = `<td>${data}</td><td>${row.game_id}</td><td>${row.name}</td>` +
-          `<td>${(Number(row.rtp) / 100).toFixed(2)}</td><td>${row.extra}</td><td>${row.provider}</td>`;
+        const badge = {
+          down: '<span class="badge bg-danger">▼ Negativo</span>',
+          up: '<span class="badge bg-success">▲ Positivo</span>',
+          neutral: '<span class="badge bg-secondary">▬</span>',
+        }[row.rtp_status || 'neutral'];
+        tr.innerHTML =
+          `<td>${data}</td><td>${row.game_id}</td><td>${row.name}</td>` +
+          `<td>${(Number(row.rtp) / 100).toFixed(2)}</td>` +
+          `<td>${row.extra}</td><td>${badge}</td><td>${row.provider}</td>`;
         tbody.appendChild(tr);
       }
     }
