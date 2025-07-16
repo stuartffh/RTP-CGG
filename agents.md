@@ -1,6 +1,6 @@
 ## Lista de Agentes
 
-Para instruções de configuração e diretrizes de contribuição, consulte o arquivo `AGENTS.md`.
+> **Escopo:** este documento descreve os agentes e integrações do projeto, incluindo permissões e comportamentos. Para diretrizes de instalação e contribuição, consulte `AGENTS.md`.
 
 - **RTP-CGG**: Servidor Flask que exibe o RTP dos jogos em tempo real.
 - **Analytics**: Registra o histórico de RTP no banco SQLite para exibição na página de analytics.
