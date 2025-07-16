@@ -274,50 +274,6 @@ def api_search_rtp():
             print(exc)
         return jsonify([])
 
-
-def search_rtp():
-    search_term = None
-    if request.is_json:
-        search_term = request.json.get("search")
-    if not search_term:
-        search_term = request.form.get("search")
-    if not search_term:
-        return jsonify({"erro": "Consulta inválida"}), 400
-
-    search_url = "https://cbet.gg/casinogo/widgets/v2/live-rtp/search"
-    search_headers = headers.copy()
-    search_headers["accept"] = "application/json"
-    search_headers["content-type"] = "application/json"
-
-    try:
-        if DEBUG_REQUESTS:
-            print("\n[DEBUG] >>> Enviando Requisição de Busca <<<")
-            print(f"[DEBUG] URL: {search_url}")
-            print(f"[DEBUG] Headers: {search_headers}")
-            print(f"[DEBUG] Termo: {search_term}")
-            print(f"[DEBUG] SSL Verify: {VERIFY_SSL}")
-
-        resp = requests.post(
-            search_url,
-            headers=search_headers,
-            json={"search": search_term},
-            verify=VERIFY_SSL,
-        )
-        resp.raise_for_status()
-
-        if DEBUG_REQUESTS:
-            print("\n[DEBUG] <<< Resposta Busca >>>")
-            print(f"[DEBUG] Status Code: {resp.status_code}")
-            print(f"[DEBUG] Conteúdo JSON: {resp.text}\n")
-
-        return jsonify(resp.json())
-    except requests.RequestException as exc:
-        if DEBUG_REQUESTS:
-            print("[DEBUG] Erro na requisição de busca")
-            print(exc)
-        return jsonify({"erro": "Falha ao buscar jogos"}), 500
-
-
 @app.route("/imagens/<int:game_id>.webp")
 def cached_image(game_id):
     file_path = os.path.join(IMAGE_CACHE_DIR, f"{game_id}.webp")
