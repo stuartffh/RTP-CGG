@@ -94,6 +94,14 @@ Crie a tabela executando o script `schema.sql`:
 psql "$DATABASE_URL" -f schema.sql
 ```
 
+Se a tabela já existir, atualize o tipo da coluna `game_id` executando:
+
+```bash
+psql "$DATABASE_URL" -c "ALTER TABLE rtp_history ALTER COLUMN game_id TYPE BIGINT"
+psql "$DATABASE_URL" -c "ALTER TABLE rtp_history ALTER COLUMN extra TYPE BIGINT"
+```
+
+
 ## Habilitar página de analytics
 
 A página `/analytics` fica desabilitada por padrão. Defina a variável
