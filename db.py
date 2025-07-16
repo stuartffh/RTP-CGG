@@ -37,13 +37,16 @@ def insert_games(games: list[dict]):
             if game_id is None:
                 continue
             cur.execute(
-                "SELECT rtp, extra FROM rtp_history WHERE game_id=%s ORDER BY timestamp DESC LIMIT 1",
+                "SELECT rtp, extra FROM rtp_history WHERE game_id=%s ORDER BY timestamp DESC LIMIT 4",
                 (game_id,),
             )
-            last = cur.fetchone()
+            recent = cur.fetchall()
             rtp = game.get("rtp")
             extra = game.get("extra")
-            if last is None or last["rtp"] != rtp or last["extra"] != extra:
+            skip = False
+            if recent and len(recent) == 4:
+                skip = all(r["rtp"] == rtp and r["extra"] == extra for r in recent)
+            if not skip:
                 records.append(
                     (
                         game_id,
