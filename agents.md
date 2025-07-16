@@ -1,5 +1,7 @@
 ## Lista de Agentes
 
+Para instruções de configuração e diretrizes de contribuição, consulte o arquivo `AGENTS.md`.
+
 - **RTP-CGG**: Servidor Flask que exibe o RTP dos jogos em tempo real.
 
 ## Funções e Comportamentos

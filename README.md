@@ -81,3 +81,7 @@ python app.py --insecure
 
 Utilize essa opção apenas em cenários de desenvolvimento ou testes.
 
+## Documentação para contribuidores
+
+As diretrizes de instalação e desenvolvimento estão em `AGENTS.md`. Já o arquivo `agents.md` concentra a descrição dos agentes e integrações. Consulte ambos ao fazer alterações.
+
