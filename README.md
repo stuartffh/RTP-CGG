@@ -85,15 +85,17 @@ Utilize essa opção apenas em cenários de desenvolvimento ou testes.
 ## Banco de dados SQLite
 
 Para gerar relatórios de RTP é possível armazenar os valores em um banco SQLite.
-Crie o arquivo `analytics.db` executando o script abaixo:
+Crie o arquivo `rtp.db` executando o script abaixo:
 
 ```bash
-sqlite3 analytics.db <<SQL
-CREATE TABLE IF NOT EXISTS history (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  game_id INTEGER NOT NULL,
-  rtp REAL NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+sqlite3 rtp.db <<SQL
+CREATE TABLE IF NOT EXISTS rtp_history (
+  game_id INTEGER,
+  name TEXT,
+  provider TEXT,
+  rtp REAL,
+  extra INTEGER,
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 SQL
 ```
@@ -109,7 +111,7 @@ ENABLE_ANALYTICS=true python app.py
 
 ### Consultar histórico
 
-O endpoint `/api/history` retorna os registros gravados no banco.
+O endpoint `/api/history` retorna os registros gravados na tabela `rtp_history`.
 
 Exemplos de uso:
 
