@@ -108,6 +108,21 @@ def prioritize_games(games):
     return sorted_games
 
 
+def has_changes(novos, antigos):
+    """Verifica se a lista de jogos foi alterada."""
+    mapa_antigo = {g.get("id"): g for g in antigos}
+    for jogo in novos:
+        jid = jogo.get("id")
+        anterior = mapa_antigo.get(jid)
+        if anterior is None:
+            return True
+        if jogo.get("rtp") != anterior.get("rtp") or jogo.get("extra") != anterior.get(
+            "extra"
+        ):
+            return True
+    return False
+
+
 def fetch_games_data():
     if DEBUG_REQUESTS:
         print("\n[DEBUG] >>> Enviando Requisição <<<")
@@ -334,12 +349,14 @@ def handle_connect():
 
 
 def background_fetch():
+    global latest_games
     while True:
         try:
-            global latest_games
-            latest_games = fetch_games_data()
-            db.insert_games(latest_games)
-            socketio.emit("games_update", latest_games)
+            novos = fetch_games_data()
+            if has_changes(novos, latest_games):
+                latest_games = novos
+                db.insert_games(latest_games)
+                socketio.emit("games_update", latest_games)
         finally:
             socketio.sleep(3)
 
