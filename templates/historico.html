@@ -29,7 +29,7 @@
           <th>Provedor</th>
           <th>Período</th>
           <th>RTP Médio</th>
-          <th>Extra Médio</th>
+          <th>Unidades Médias</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -59,14 +59,14 @@
       tbody.innerHTML = '';
       for (const row of rows) {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${row.name}</td><td>${row.provider}</td><td>${row.periodo}</td><td>${Number(row.rtp).toFixed(2)}</td><td>${Number(row.extra).toFixed(2)}</td>`;
+        tr.innerHTML = `<td>${row.name}</td><td>${row.provider}</td><td>${row.periodo}</td><td>${(Number(row.rtp) / 100).toFixed(2)}</td><td>${Number(row.extra).toFixed(2)}</td>`;
         tbody.appendChild(tr);
       }
     }
     let chart;
     function renderChart(rows) {
       const labels = rows.map(r => r.periodo);
-      const valores = rows.map(r => r.rtp);
+      const valores = rows.map(r => r.rtp / 100);
       if (chart) chart.destroy();
       chart = new Chart(document.getElementById('chart'), {
         type: 'line',

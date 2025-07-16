@@ -15,10 +15,10 @@ let isSearching = false;
 let currentQuery = '';
 let modalInterval = null;
 const IMAGE_ENDPOINT = '/imagens';
-let extraPosAlert = null;
-let extraNegAlert = null;
-const extraPosTriggered = new Set();
-const extraNegTriggered = new Set();
+let unidadesPosAlert = null;
+let unidadesNegAlert = null;
+const unidadesPosTriggered = new Set();
+const unidadesNegTriggered = new Set();
 
 function setupWinnersModal() {
     const modalEl = document.getElementById('winnersModal');
@@ -86,22 +86,24 @@ function saveAlerts() {
     }
 }
 
-function loadExtraConfig() {
-    const pos = parseFloat(localStorage.getItem('alert_extra_pos'));
-    const neg = parseFloat(localStorage.getItem('alert_extra_neg'));
-    extraPosAlert = isNaN(pos) ? null : pos;
-    extraNegAlert = isNaN(neg) ? null : neg;
-    const posEl = document.getElementById('alert-extra-pos');
-    const negEl = document.getElementById('alert-extra-neg');
-    if (posEl && extraPosAlert !== null) posEl.value = extraPosAlert;
-    if (negEl && extraNegAlert !== null) negEl.value = extraNegAlert;
+function loadUnidadesConfig() {
+    const pos = parseFloat(localStorage.getItem('alert_unidades_pos'));
+    const neg = parseFloat(localStorage.getItem('alert_unidades_neg'));
+    unidadesPosAlert = isNaN(pos) ? null : pos;
+    unidadesNegAlert = isNaN(neg) ? null : neg;
+    const posEl = document.getElementById('alert-unidades-pos');
+    const negEl = document.getElementById('alert-unidades-neg');
+    if (posEl && unidadesPosAlert !== null) posEl.value = unidadesPosAlert;
+    if (negEl && unidadesNegAlert !== null) negEl.value = unidadesNegAlert;
 }
 
-function saveExtraConfig() {
-    if (extraPosAlert !== null) localStorage.setItem('alert_extra_pos', extraPosAlert);
-    else localStorage.removeItem('alert_extra_pos');
-    if (extraNegAlert !== null) localStorage.setItem('alert_extra_neg', extraNegAlert);
-    else localStorage.removeItem('alert_extra_neg');
+function saveUnidadesConfig() {
+    if (unidadesPosAlert !== null)
+        localStorage.setItem('alert_unidades_pos', unidadesPosAlert);
+    else localStorage.removeItem('alert_unidades_pos');
+    if (unidadesNegAlert !== null)
+        localStorage.setItem('alert_unidades_neg', unidadesNegAlert);
+    else localStorage.removeItem('alert_unidades_neg');
 }
 
 function renderAlerts() {
@@ -140,28 +142,28 @@ function applyPriorities(games) {
     return sorted;
 }
 
-function checkExtraAlerts() {
+function checkUnidadesAlerts() {
     gamesData.forEach(g => {
         const val = typeof g.extra === 'number' ? g.extra : null;
         if (val === null) return;
-        if (extraPosAlert !== null) {
-            if (val >= extraPosAlert) {
-                if (!extraPosTriggered.has(g.id)) {
+        if (unidadesPosAlert !== null) {
+            if (val >= unidadesPosAlert) {
+                if (!unidadesPosTriggered.has(g.id)) {
                     alertSound?.play().catch(err => console.error('Falha ao tocar alerta', err));
-                    extraPosTriggered.add(g.id);
+                    unidadesPosTriggered.add(g.id);
                 }
             } else {
-                extraPosTriggered.delete(g.id);
+                unidadesPosTriggered.delete(g.id);
             }
         }
-        if (extraNegAlert !== null) {
-            if (val <= extraNegAlert) {
-                if (!extraNegTriggered.has(g.id)) {
+        if (unidadesNegAlert !== null) {
+            if (val <= unidadesNegAlert) {
+                if (!unidadesNegTriggered.has(g.id)) {
                     alertSound?.play().catch(err => console.error('Falha ao tocar alerta', err));
-                    extraNegTriggered.add(g.id);
+                    unidadesNegTriggered.add(g.id);
                 }
             } else {
-                extraNegTriggered.delete(g.id);
+                unidadesNegTriggered.delete(g.id);
             }
         }
     });
@@ -186,7 +188,7 @@ function handleGamesData(data) {
             alertSound?.play().catch(err => console.error('Falha ao tocar alerta', err));
         }
     });
-    checkExtraAlerts();
+    checkUnidadesAlerts();
     populateProviders();
     if (currentSort) {
         sortBy(currentSort);
@@ -626,10 +628,10 @@ function filterAndRender() {
     const showNeg = document.getElementById('show-negative')?.checked ?? true;
     const minRtp = parseFloat(document.getElementById('min-rtp')?.value) || null;
     const maxRtp = parseFloat(document.getElementById('max-rtp')?.value) || null;
-    const minExtra = parseFloat(document.getElementById('min-extra')?.value);
-    const maxExtra = parseFloat(document.getElementById('max-extra')?.value);
-    const minE = isNaN(minExtra) ? null : minExtra;
-    const maxE = isNaN(maxExtra) ? null : maxExtra;
+    const minUnidades = parseFloat(document.getElementById('min-unidades')?.value);
+    const maxUnidades = parseFloat(document.getElementById('max-unidades')?.value);
+    const minE = isNaN(minUnidades) ? null : minUnidades;
+    const maxE = isNaN(maxUnidades) ? null : maxUnidades;
 
     let filtered = gamesData.filter(game => {
         if (!isSearching && query && !game.name.toLowerCase().includes(query)) return false;
@@ -699,8 +701,8 @@ document.addEventListener('click', async (e) => {
     document.getElementById('show-negative')?.addEventListener('change', filterAndRender);
     document.getElementById('min-rtp')?.addEventListener('input', debounce(filterAndRender, 300));
     document.getElementById('max-rtp')?.addEventListener('input', debounce(filterAndRender, 300));
-    document.getElementById('min-extra')?.addEventListener('input', debounce(filterAndRender, 300));
-    document.getElementById('max-extra')?.addEventListener('input', debounce(filterAndRender, 300));
+    document.getElementById('min-unidades')?.addEventListener('input', debounce(filterAndRender, 300));
+    document.getElementById('max-unidades')?.addEventListener('input', debounce(filterAndRender, 300));
     document.getElementById('show-winners')?.addEventListener('change', async e => {
         if (e.target.checked) {
             if (!winnersModal) {
@@ -735,19 +737,19 @@ document.addEventListener('click', async (e) => {
         if (valueEl) valueEl.value = '';
     });
 
-    document.getElementById('alert-extra-pos')?.addEventListener('input', e => {
+    document.getElementById('alert-unidades-pos')?.addEventListener('input', e => {
         const v = parseFloat(e.target.value);
-        extraPosAlert = isNaN(v) ? null : v;
-        saveExtraConfig();
+        unidadesPosAlert = isNaN(v) ? null : v;
+        saveUnidadesConfig();
     });
-    document.getElementById('alert-extra-neg')?.addEventListener('input', e => {
+    document.getElementById('alert-unidades-neg')?.addEventListener('input', e => {
         const v = parseFloat(e.target.value);
-        extraNegAlert = isNaN(v) ? null : v;
-        saveExtraConfig();
+        unidadesNegAlert = isNaN(v) ? null : v;
+        saveUnidadesConfig();
     });
 
     loadAlerts();
-    loadExtraConfig();
+    loadUnidadesConfig();
     renderAlerts();
     if (window.USE_MELHORES_API) {
         fetchMelhores(true);
