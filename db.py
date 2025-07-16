@@ -108,24 +108,36 @@ def query_history(
 
 def list_games() -> list[dict]:
     """Retorna jogos distintos armazenados no banco."""
-    with get_connection() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-        cur.execute("SELECT DISTINCT game_id, name FROM rtp_history ORDER BY name")
-        return cur.fetchall()
+    try:
+        with get_connection() as conn, conn.cursor(
+            cursor_factory=RealDictCursor
+        ) as cur:
+            cur.execute("SELECT DISTINCT game_id, name FROM rtp_history ORDER BY name")
+            return cur.fetchall()
+    except Exception as exc:  # pragma: no cover - log para diagnostico
+        print("Erro ao consultar jogos:", exc)
+        return []
 
 
 def game_history(game_id: int) -> list[dict]:
     """Retorna todos os registros de um jogo ordenados por data."""
-    with get_connection() as conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-        cur.execute(
-            """
-            SELECT game_id, name, provider, rtp, extra, timestamp
-            FROM rtp_history
-            WHERE game_id = %s
-            ORDER BY timestamp DESC
-            """,
-            (game_id,),
-        )
-        return cur.fetchall()
+    try:
+        with get_connection() as conn, conn.cursor(
+            cursor_factory=RealDictCursor
+        ) as cur:
+            cur.execute(
+                """
+                SELECT game_id, name, provider, rtp, extra, timestamp
+                FROM rtp_history
+                WHERE game_id = %s
+                ORDER BY timestamp DESC
+                """,
+                (game_id,),
+            )
+            return cur.fetchall()
+    except Exception as exc:  # pragma: no cover - log para diagnostico
+        print("Erro ao consultar histórico:", exc)
+        return []
 
 
 init_db()
