@@ -275,6 +275,20 @@ def api_history():
         return jsonify([]), 400
 
 
+@app.route("/api/history/games")
+def api_history_games():
+    """Lista jogos disponíveis no histórico."""
+    return jsonify(db.list_games())
+
+
+@app.route("/api/game-history")
+def api_game_history():
+    gid = request.args.get("game_id", type=int)
+    if gid is None:
+        return jsonify([]), 400
+    return jsonify(db.game_history(gid))
+
+
 @app.route("/api/search-rtp", methods=["POST"])
 def api_search_rtp():
     try:

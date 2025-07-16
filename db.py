@@ -103,4 +103,28 @@ def query_history(
         return [dict(row) for row in cur.fetchall()]
 
 
+def list_games() -> list[dict]:
+    """Retorna jogos distintos armazenados no banco."""
+    with get_connection() as conn:
+        cur = conn.execute(
+            "SELECT DISTINCT game_id, name FROM rtp_history ORDER BY name"
+        )
+        return [dict(row) for row in cur.fetchall()]
+
+
+def game_history(game_id: int) -> list[dict]:
+    """Retorna todos os registros de um jogo ordenados por data."""
+    with get_connection() as conn:
+        cur = conn.execute(
+            """
+            SELECT game_id, name, provider, rtp, extra, timestamp
+            FROM rtp_history
+            WHERE game_id = ?
+            ORDER BY timestamp DESC
+            """,
+            (game_id,),
+        )
+        return [dict(row) for row in cur.fetchall()]
+
+
 init_db()

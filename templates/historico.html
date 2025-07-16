@@ -12,65 +12,76 @@
 <body>
   <div class="container py-3">
     <div class="mb-3 d-flex gap-2">
-      <input id="search-name" type="text" class="form-control" placeholder="Pesquisar jogo" />
-      <select id="period" class="form-select w-auto">
-        <option value="daily">Diário</option>
-        <option value="weekly">Semanal</option>
-        <option value="monthly">Mensal</option>
-      </select>
-      <button id="btn-search" class="btn btn-primary">Buscar</button>
+      <select id="game-select" class="form-select"></select>
       <a href="/" class="btn btn-secondary">Voltar</a>
     </div>
     <canvas id="chart" class="mb-4"></canvas>
     <table class="table table-dark table-striped" id="history-table">
       <thead>
         <tr>
-          <th>Jogo</th>
+          <th>Data</th>
+          <th>RTP (%)</th>
+          <th>Unidades</th>
           <th>Provedor</th>
-          <th>Período</th>
-          <th>RTP Médio</th>
-          <th>Unidades Médias</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </div>
   <script>
-    document.getElementById('btn-search').addEventListener('click', loadHistory);
-    async function loadHistory() {
-      const search = document.getElementById('search-name').value.trim();
-      const period = document.getElementById('period').value;
-      let url = `/api/history?period=${period}`;
-      if (search) {
-        if (/^\d+$/.test(search)) {
-          url += `&game_id=${encodeURIComponent(search)}`;
-        } else {
-          url += `&name=${encodeURIComponent(search)}`;
-        }
+    document.addEventListener('DOMContentLoaded', init);
+    async function init() {
+      await loadGames();
+      document.getElementById('game-select').addEventListener('change', loadHistory);
+    }
+
+    async function loadGames() {
+      const resp = await fetch('/api/history/games');
+      if (!resp.ok) return;
+      const games = await resp.json();
+      const select = document.getElementById('game-select');
+      select.innerHTML = '';
+      for (const game of games) {
+        const opt = document.createElement('option');
+        opt.value = game.game_id;
+        opt.textContent = game.name;
+        select.appendChild(opt);
       }
-      const resp = await fetch(url);
+      if (games.length) {
+        select.value = games[0].game_id;
+        loadHistory();
+      }
+    }
+
+    async function loadHistory() {
+      const gid = document.getElementById('game-select').value;
+      if (!gid) return;
+      const resp = await fetch(`/api/game-history?game_id=${gid}`);
       if (!resp.ok) return;
       const data = await resp.json();
       renderTable(data);
       renderChart(data);
     }
+
     function renderTable(rows) {
       const tbody = document.querySelector('#history-table tbody');
       tbody.innerHTML = '';
       for (const row of rows) {
+        const date = new Date(row.timestamp).toLocaleString();
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${row.name}</td><td>${row.provider}</td><td>${row.periodo}</td><td>${(Number(row.rtp) / 100).toFixed(2)}</td><td>${Number(row.extra).toFixed(2)}</td>`;
+        tr.innerHTML = `<td>${date}</td><td>${(Number(row.rtp) / 100).toFixed(2)}</td><td>${row.extra}</td><td>${row.provider}</td>`;
         tbody.appendChild(tr);
       }
     }
+
     let chart;
     function renderChart(rows) {
-      const labels = rows.map(r => r.periodo);
+      const labels = rows.map(r => new Date(r.timestamp).toLocaleDateString());
       const valores = rows.map(r => r.rtp / 100);
       if (chart) chart.destroy();
       chart = new Chart(document.getElementById('chart'), {
         type: 'line',
-        data: { labels, datasets: [{ label: 'RTP Médio', data: valores, borderColor: 'rgb(75, 192, 192)', tension: 0.1 }] },
+        data: { labels, datasets: [{ label: 'RTP', data: valores, borderColor: 'rgb(75, 192, 192)', tension: 0.1 }] },
       });
     }
   </script>
