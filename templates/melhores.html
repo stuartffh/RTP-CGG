@@ -23,8 +23,8 @@
           </select>
           <input id="min-rtp" type="number" step="0.01" class="form-control mb-2" placeholder="RTP mínimo (%)" />
           <input id="max-rtp" type="number" step="0.01" class="form-control mb-2" placeholder="RTP máximo (%)" />
-          <input id="min-extra" type="number" step="1" class="form-control mb-2" placeholder="Extra mínimo" />
-          <input id="max-extra" type="number" step="1" class="form-control mb-2" placeholder="Extra máximo" />
+          <input id="min-unidades" type="number" step="1" class="form-control mb-2" placeholder="Unidades mínimas" />
+          <input id="max-unidades" type="number" step="1" class="form-control mb-2" placeholder="Unidades máximas" />
           <div class="form-check">
             <input class="form-check-input" type="checkbox" id="show-positive" checked />
             <label class="form-check-label" for="show-positive">Mostrar RTP Alto</label>
@@ -33,8 +33,8 @@
             <input class="form-check-input" type="checkbox" id="show-negative" checked />
             <label class="form-check-label" for="show-negative">Mostrar RTP Baixo</label>
           </div>
-          <input id="alert-extra-pos" type="number" step="1" class="form-control mb-2" placeholder="Extra positivo (≥)" />
-          <input id="alert-extra-neg" type="number" step="1" class="form-control mb-2" placeholder="Extra negativo (≤)" />
+          <input id="alert-unidades-pos" type="number" step="1" class="form-control mb-2" placeholder="Unidades positivas (≥)" />
+          <input id="alert-unidades-neg" type="number" step="1" class="form-control mb-2" placeholder="Unidades negativas (≤)" />
           <button class="btn btn-success w-100 mb-2" onclick="sortBy('rtp')">🔼 Ordenar por RTP</button>
           <button class="btn btn-info w-100 mb-2" onclick="sortBy('name')">🔤 Ordenar por Nome</button>
 
