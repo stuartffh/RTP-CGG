@@ -14,6 +14,11 @@ Para instruções de configuração e diretrizes de contribuição, consulte o a
 - `GET /api/history` – recupera registros da tabela `history` em `analytics.db`.
 - A tela de busca utiliza `/api/search-rtp` diretamente e atualiza os dados a cada segundo enquanto houver termo ativo ou um jogo estiver aberto.
 
+- `GET /historico` – exibe gráfico e tabela de históricos gravados em banco local.
+- `GET /api/history?period=` – retorna médias diárias, semanais ou mensais do RTP.
+
+
 ### Permissões
 
 O agente de analytics precisa de permissão de leitura e escrita no arquivo `analytics.db`.
+
