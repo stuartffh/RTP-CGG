@@ -54,6 +54,20 @@
             class="form-control mb-2"
             placeholder="RTP máximo (%)"
           />
+          <input
+            id="min-extra"
+            type="number"
+            step="1"
+            class="form-control mb-2"
+            placeholder="Extra mínimo"
+          />
+          <input
+            id="max-extra"
+            type="number"
+            step="1"
+            class="form-control mb-2"
+            placeholder="Extra máximo"
+          />
           <div class="form-check">
             <input
               class="form-check-input"
@@ -107,6 +121,20 @@
             ➕ Adicionar Alerta
           </button>
           <ul id="alerts-list" class="list-group mb-2"></ul>
+          <input
+            id="alert-extra-pos"
+            type="number"
+            step="1"
+            class="form-control mb-2"
+            placeholder="Extra positivo (≥)"
+          />
+          <input
+            id="alert-extra-neg"
+            type="number"
+            step="1"
+            class="form-control mb-2"
+            placeholder="Extra negativo (≤)"
+          />
           <button class="btn btn-success w-100 mb-2" onclick="sortBy('rtp')">
             🔼 Ordenar por RTP
           </button>

@@ -14,6 +14,10 @@ Para instruções de configuração e diretrizes de contribuição, consulte o a
 - `GET /api/history` – recupera registros da tabela `history` em `analytics.db`.
 - A tela de busca utiliza `/api/search-rtp` diretamente e atualiza os dados a cada segundo enquanto houver termo ativo ou um jogo estiver aberto.
 
+- A interface possui filtros `min-extra` e `max-extra` para limitar a listagem pelos valores de `extra`.
+- Os campos `alert-extra-pos` e `alert-extra-neg` tocam um som quando qualquer jogo ultrapassa os limites configurados.
+
+
 - `GET /historico` – exibe gráfico e tabela de históricos gravados em banco local.
 - `GET /api/history?period=` – retorna médias diárias, semanais ou mensais do RTP.
 
@@ -21,4 +25,5 @@ Para instruções de configuração e diretrizes de contribuição, consulte o a
 ### Permissões
 
 O agente de analytics precisa de permissão de leitura e escrita no arquivo `analytics.db`.
+
 
