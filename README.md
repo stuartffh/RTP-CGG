@@ -121,3 +121,8 @@ curl http://localhost:5000/api/history?limit=50
 curl http://localhost:5000/api/history?game_id=1024
 ```
 
+## Documentação para contribuidores
+
+As diretrizes de instalação e desenvolvimento estão em `AGENTS.md`. Já o arquivo `agents.md` concentra a descrição dos agentes e integrações. Consulte ambos ao fazer alterações.
+
+
