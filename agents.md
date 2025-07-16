@@ -7,6 +7,7 @@
 - **Analytics**: Registra o histórico de RTP no banco SQLite `rtp.db`, na tabela `rtp_history`, incluindo a coluna `rtp_status` (up, down ou neutral) para exibição na página de analytics.
 
 - **Analytics**: Registra o histórico de RTP em um banco PostgreSQL definido pela variável `DATABASE_URL`. O endereço padrão é `postgres://postgres:2412055aa@185.44.66.206:5432/vigilancia?sslmode=disable`. Os dados ficam na tabela `rtp_history` para exibição na página de analytics.
+- Ao iniciar, este agente verifica se a coluna `rtp_status` existe e a cria automaticamente caso necessário.
 
 
 ## Funções e Comportamentos
