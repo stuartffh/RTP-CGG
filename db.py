@@ -28,24 +28,38 @@ def insert_games(games: list[dict]):
     if not games:
         return
     with get_connection() as conn:
-        conn.executemany(
-            "INSERT INTO rtp_history (game_id, name, provider, rtp, extra) VALUES (?, ?, ?, ?, ?)",
-            [
-                (
-                    g.get("id"),
-                    g.get("name"),
+        records = []
+        for game in games:
+            game_id = game.get("id")
+            if game_id is None:
+                continue
+            cur = conn.execute(
+                "SELECT rtp, extra FROM rtp_history WHERE game_id=? ORDER BY timestamp DESC LIMIT 1",
+                (game_id,),
+            )
+            last = cur.fetchone()
+            rtp = game.get("rtp")
+            extra = game.get("extra")
+            if last is None or last["rtp"] != rtp or last["extra"] != extra:
+                records.append(
                     (
-                        g.get("provider", {}).get("name")
-                        if isinstance(g.get("provider"), dict)
-                        else g.get("provider")
-                    ),
-                    g.get("rtp"),
-                    g.get("extra"),
+                        game_id,
+                        game.get("name"),
+                        (
+                            game.get("provider", {}).get("name")
+                            if isinstance(game.get("provider"), dict)
+                            else game.get("provider")
+                        ),
+                        rtp,
+                        extra,
+                    )
                 )
-                for g in games
-            ],
-        )
-        conn.commit()
+        if records:
+            conn.executemany(
+                "INSERT INTO rtp_history (game_id, name, provider, rtp, extra) VALUES (?, ?, ?, ?, ?)",
+                records,
+            )
+            conn.commit()
 
 
 def query_history(
