@@ -11,6 +11,8 @@ from google.protobuf.descriptor_pb2 import FileDescriptorProto
 from google.protobuf.descriptor_pool import DescriptorPool
 from google.protobuf.json_format import MessageToDict
 
+import db
+
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
@@ -228,6 +230,11 @@ def melhores():
     return render_template("melhores.html")
 
 
+@app.route("/historico")
+def historico():
+    return render_template("historico.html")
+
+
 @app.route("/api/games")
 def games():
     global latest_games
@@ -240,6 +247,15 @@ def api_melhores():
     global latest_games
     latest_games = fetch_games_data()
     return jsonify(prioritize_games(latest_games))
+
+
+@app.route("/api/history")
+def api_history():
+    period = request.args.get("period", "daily")
+    try:
+        return jsonify(db.query_history(period))
+    except ValueError:
+        return jsonify([]), 400
 
 
 @app.route("/api/search-rtp", methods=["POST"])
@@ -334,6 +350,7 @@ def background_fetch():
         try:
             global latest_games
             latest_games = fetch_games_data()
+            db.insert_games(latest_games)
             socketio.emit("games_update", latest_games)
         finally:
             socketio.sleep(3)

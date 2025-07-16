@@ -1,5 +1,7 @@
 # Repository Guidelines
 
+Consulte o arquivo `agents.md` para detalhes sobre os agentes da aplicação. Atualize este documento apenas com diretrizes de configuração e desenvolvimento do repositório.
+
 ## Setup
 - Use **Python 3.12**.
 - Install dependencies with `pip install -r requirements.txt` in a virtual environment.
