@@ -48,7 +48,9 @@ def insert_games(games: list[dict]):
         conn.commit()
 
 
-def query_history(period: str = "daily"):
+def query_history(
+    period: str = "daily", game_id: int | None = None, name: str | None = None
+):
     period_map = {
         "daily": "strftime('%Y-%m-%d', timestamp)",
         "weekly": "strftime('%Y-%W', timestamp)",
@@ -57,9 +59,19 @@ def query_history(period: str = "daily"):
     group_by = period_map.get(period)
     if not group_by:
         raise ValueError("Periodo invalido")
-    with get_connection() as conn:
-        cur = conn.execute(
-            f"""
+
+    where_clauses: list[str] = []
+    params: list = []
+    if game_id is not None:
+        where_clauses.append("game_id = ?")
+        params.append(game_id)
+    if name:
+        where_clauses.append("lower(name) LIKE ?")
+        params.append(f"%{name.lower()}%")
+
+    where_sql = f"WHERE {' AND '.join(where_clauses)}" if where_clauses else ""
+
+    query = f"""
             SELECT
                 game_id,
                 name,
@@ -68,10 +80,12 @@ def query_history(period: str = "daily"):
                 AVG(extra) AS extra,
                 {group_by} AS periodo
             FROM rtp_history
+            {where_sql}
             GROUP BY game_id, periodo
             ORDER BY periodo DESC
         """
-        )
+    with get_connection() as conn:
+        cur = conn.execute(query, params)
         return [dict(row) for row in cur.fetchall()]
 
 

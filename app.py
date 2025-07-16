@@ -263,8 +263,14 @@ def api_melhores():
 @app.route("/api/history")
 def api_history():
     period = request.args.get("period", "daily")
+    game_id = request.args.get("game_id")
+    name = request.args.get("name")
     try:
-        return jsonify(db.query_history(period))
+        gid = int(game_id) if game_id is not None else None
+    except ValueError:
+        return jsonify([]), 400
+    try:
+        return jsonify(db.query_history(period, game_id=gid, name=name))
     except ValueError:
         return jsonify([]), 400
 
