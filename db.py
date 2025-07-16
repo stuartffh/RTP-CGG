@@ -25,6 +25,19 @@ def init_db():
             timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         )"""
         )
+        # garante que a coluna rtp_status exista em bancos legados
+        cur.execute(
+            """
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name='rtp_history' AND column_name='rtp_status'
+            """
+        )
+        if cur.fetchone() is None:
+            cur.execute("ALTER TABLE rtp_history ADD COLUMN rtp_status TEXT")
+            cur.execute(
+                "UPDATE rtp_history SET rtp_status = CASE WHEN extra IS NULL "
+                "THEN 'neutral' WHEN extra < 0 THEN 'down' ELSE 'up' END"
+            )
         conn.commit()
 
 
