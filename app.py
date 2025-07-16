@@ -30,6 +30,7 @@ VERIFY_SSL = os.environ.get("VERIFY_SSL", "true").lower() not in (
     "0",
     "no",
 )
+REQUEST_TIMEOUT = 10
 
 url = "https://cbet.gg/casinogo/widgets/v2/live-rtp"
 search_url = "https://cbet.gg/casinogo/widgets/v2/live-rtp/search"
@@ -115,14 +116,20 @@ def fetch_games_data():
         print(f"[DEBUG] Data (bytes): {data}")
         print(f"[DEBUG] SSL Verify: {VERIFY_SSL}")
 
-    response = requests.post(url, headers=headers, data=data, verify=VERIFY_SSL)
+    response = requests.post(
+        url, headers=headers, data=data, verify=VERIFY_SSL, timeout=REQUEST_TIMEOUT
+    )
 
     if DEBUG_REQUESTS:
         print("\n[DEBUG] >>> Enviando Requisição Semanal <<<")
         print(f"[DEBUG] Data Semanal (bytes): {data_weekly}")
 
     response_weekly = requests.post(
-        url, headers=headers, data=data_weekly, verify=VERIFY_SSL
+        url,
+        headers=headers,
+        data=data_weekly,
+        verify=VERIFY_SSL,
+        timeout=REQUEST_TIMEOUT,
     )
 
     if DEBUG_REQUESTS:
@@ -185,7 +192,11 @@ def fetch_games_by_name(names: list[str]):
 
         try:
             resp = requests.post(
-                search_url, headers=headers, data=body, verify=VERIFY_SSL
+                search_url,
+                headers=headers,
+                data=body,
+                verify=VERIFY_SSL,
+                timeout=REQUEST_TIMEOUT,
             )
             resp.raise_for_status()
 
@@ -302,6 +313,7 @@ def search_rtp():
             headers=search_headers,
             json={"search": search_term},
             verify=VERIFY_SSL,
+            timeout=REQUEST_TIMEOUT,
         )
         resp.raise_for_status()
 
@@ -370,7 +382,10 @@ def last_winners():
             print(f"[DEBUG] SSL Verify: {VERIFY_SSL}")
 
         response = requests.post(
-            winners_url, headers=winners_headers, verify=VERIFY_SSL
+            winners_url,
+            headers=winners_headers,
+            verify=VERIFY_SSL,
+            timeout=REQUEST_TIMEOUT,
         )
         response.raise_for_status()
 
