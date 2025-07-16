@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS rtp_history (
-    game_id INTEGER,
+    game_id BIGINT,
     name TEXT,
     provider TEXT,
     rtp REAL,
-    extra INTEGER,
+    extra BIGINT,
     timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
