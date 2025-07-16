@@ -18,6 +18,7 @@
 - `GET /api/last-winners` – obtém os últimos vencedores do cassino.
 - `GET /api/history` – recupera registros da tabela `rtp_history` no banco definido em `DATABASE_URL`.
 - A tela de busca utiliza `/api/search-rtp` diretamente, atualizando os dados após a pesquisa e tentando novamente após alguns segundos quando necessário.
+- Durante uma busca, os jogos exibidos também recebem atualizações em tempo real quando disponíveis pelo websocket.
 
 - A interface possui filtros `min-extra` e `max-extra` para limitar a listagem pelos valores de `extra`.
 - Os campos `alert-extra-pos` e `alert-extra-neg` tocam um som quando qualquer jogo ultrapassa os limites configurados.
