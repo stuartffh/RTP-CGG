@@ -82,22 +82,16 @@ python app.py --insecure
 Utilize essa opção apenas em cenários de desenvolvimento ou testes.
 
 
-## Banco de dados SQLite
+## Banco de dados PostgreSQL
 
-Para gerar relatórios de RTP é possível armazenar os valores em um banco SQLite.
-Crie o arquivo `rtp.db` executando o script abaixo:
+A aplicação usa PostgreSQL para salvar o histórico de RTP. O endereço padrão é
+`postgres://postgres:2412055aa@185.44.66.206:5432/vigilancia?sslmode=disable`,
+mas é possível definir a variável `DATABASE_URL` para alterar a conexão.
+
+Crie a tabela executando o script `schema.sql`:
 
 ```bash
-sqlite3 rtp.db <<SQL
-CREATE TABLE IF NOT EXISTS rtp_history (
-  game_id INTEGER,
-  name TEXT,
-  provider TEXT,
-  rtp REAL,
-  extra INTEGER,
-  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-SQL
+psql "$DATABASE_URL" -f schema.sql
 ```
 
 ## Habilitar página de analytics
