@@ -9,3 +9,5 @@
 - `POST /api/search-rtp` – pesquisa jogos enviando ao endpoint `/live-rtp/search` do site cbet.gg e, caso falhe, filtra a lista localmente. Utiliza headers `accept`, `content-type`, `x-language-iso`, `origin` e `referer`. A requisição respeita a variável `VERIFY_SSL` para definir se o certificado TLS será verificado.
 - `GET /api/last-winners` – obtém os últimos vencedores do cassino.
 - A tela de busca utiliza `/api/search-rtp` diretamente e atualiza os dados a cada segundo enquanto houver termo ativo ou um jogo estiver aberto.
+- A interface possui filtros `min-extra` e `max-extra` para limitar a listagem pelos valores de `extra`.
+- Os campos `alert-extra-pos` e `alert-extra-neg` tocam um som quando qualquer jogo ultrapassa os limites configurados.
