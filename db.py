@@ -21,6 +21,7 @@ def init_db():
             provider TEXT,
             rtp REAL,
             extra BIGINT,
+            rtp_status TEXT,
             timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         )"""
         )
@@ -43,6 +44,12 @@ def insert_games(games: list[dict]):
             recent = cur.fetchall()
             rtp = game.get("rtp")
             extra = game.get("extra")
+            if extra is None:
+                status = "neutral"
+            elif extra < 0:
+                status = "down"
+            else:
+                status = "up"
             skip = False
             if recent and len(recent) == 4:
                 skip = all(r["rtp"] == rtp and r["extra"] == extra for r in recent)
@@ -58,11 +65,12 @@ def insert_games(games: list[dict]):
                         ),
                         rtp,
                         extra,
+                        status,
                     )
                 )
         if records:
             cur.executemany(
-                "INSERT INTO rtp_history (game_id, name, provider, rtp, extra) VALUES (%s, %s, %s, %s, %s)",
+                "INSERT INTO rtp_history (game_id, name, provider, rtp, extra, rtp_status) VALUES (%s, %s, %s, %s, %s, %s)",
                 records,
             )
             conn.commit()
@@ -130,7 +138,7 @@ def game_history(game_id: int) -> list[dict]:
         ) as cur:
             cur.execute(
                 """
-                SELECT game_id, name, provider, rtp, extra, timestamp
+                SELECT game_id, name, provider, rtp, extra, rtp_status, timestamp
                 FROM rtp_history
                 WHERE game_id = %s
                 ORDER BY timestamp DESC
@@ -166,7 +174,7 @@ def history_records(
         params.append(f"%{name.lower()}%")
     where_sql = f"WHERE {' AND '.join(where)}" if where else ""
     query = f"""
-        SELECT game_id, name, provider, rtp, extra, timestamp
+        SELECT game_id, name, provider, rtp, extra, rtp_status, timestamp
         FROM rtp_history
         {where_sql}
         ORDER BY timestamp DESC

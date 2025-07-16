@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS rtp_history (
     provider TEXT,
     rtp REAL,
     extra BIGINT,
+    rtp_status TEXT,
     timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

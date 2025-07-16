@@ -3,7 +3,7 @@
 > **Escopo:** este documento descreve os agentes e integrações do projeto, incluindo permissões e comportamentos. Para diretrizes de instalação e contribuição, consulte `AGENTS.md`.
 
 - **RTP-CGG**: Servidor Flask que exibe o RTP dos jogos em tempo real.
-- **Analytics**: Registra o histórico de RTP no banco SQLite `rtp.db`, na tabela `rtp_history`, para exibição na página de analytics.
+- **Analytics**: Registra o histórico de RTP no banco SQLite `rtp.db`, na tabela `rtp_history`, incluindo a coluna `rtp_status` (up, down ou neutral) para exibição na página de analytics.
 
 ## Funções e Comportamentos
 
