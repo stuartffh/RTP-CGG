@@ -81,3 +81,48 @@ python app.py --insecure
 
 Utilize essa opção apenas em cenários de desenvolvimento ou testes.
 
+
+## Banco de dados SQLite
+
+Para gerar relatórios de RTP é possível armazenar os valores em um banco SQLite.
+Crie o arquivo `analytics.db` executando o script abaixo:
+
+```bash
+sqlite3 analytics.db <<SQL
+CREATE TABLE IF NOT EXISTS history (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  game_id INTEGER NOT NULL,
+  rtp REAL NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+SQL
+```
+
+## Habilitar página de analytics
+
+A página `/analytics` fica desabilitada por padrão. Defina a variável
+`ENABLE_ANALYTICS=true` antes de iniciar o servidor para ativá-la:
+
+```bash
+ENABLE_ANALYTICS=true python app.py
+```
+
+### Consultar histórico
+
+O endpoint `/api/history` retorna os registros gravados no banco.
+
+Exemplos de uso:
+
+```bash
+# Últimos 50 registros
+curl http://localhost:5000/api/history?limit=50
+
+# Filtrar por jogo específico
+curl http://localhost:5000/api/history?game_id=1024
+```
+
+## Documentação para contribuidores
+
+As diretrizes de instalação e desenvolvimento estão em `AGENTS.md`. Já o arquivo `agents.md` concentra a descrição dos agentes e integrações. Consulte ambos ao fazer alterações.
+
+
