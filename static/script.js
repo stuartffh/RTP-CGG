@@ -172,7 +172,10 @@ function checkUnidadesAlerts() {
 function handleGamesData(data) {
     const processed = window.IS_MELHORES_PAGE ? applyPriorities(data) : data;
     socketGames = processed;
-    if (!isSearching) {
+    if (isSearching && gamesData.length) {
+        const map = new Map(processed.map(g => [g.id, g]));
+        gamesData = gamesData.map(g => map.get(g.id) || g);
+    } else if (!isSearching) {
         gamesData = processed;
     }
     alerts.forEach(alert => {
