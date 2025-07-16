@@ -51,8 +51,8 @@ def insert_games(games: list[dict]):
             else:
                 status = "up"
             skip = False
-            if recent and len(recent) == 4:
-                skip = all(r["rtp"] == rtp and r["extra"] == extra for r in recent)
+            if recent:
+                skip = any(r["rtp"] == rtp and r["extra"] == extra for r in recent)
             if not skip:
                 records.append(
                     (

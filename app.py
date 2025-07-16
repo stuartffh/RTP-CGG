@@ -90,7 +90,7 @@ latest_games = []
 
 
 def decode_signed(value):
-    if value > (1 << 63):
+    if value >= (1 << 63):
         value -= 1 << 64
     return value
 
