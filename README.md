@@ -1,6 +1,6 @@
 # RTP-CGG
 
-Aplicação Flask que consulta o endpoint `https://cgg.bet.br` e exibe em tempo real o RTP (Return to Player) dos jogos de cassino.
+Aplicação Flask que consulta o endpoint `https://cbet.gg` e exibe em tempo real o RTP (Return to Player) dos jogos de cassino.
 
 ## Pré-requisitos
 
