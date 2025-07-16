@@ -261,6 +261,12 @@ def historico():
     return render_template("historico.html")
 
 
+@app.route("/historico-registros")
+def historico_registros():
+    """Página de histórico em formato de grade."""
+    return render_template("historico_grid.html")
+
+
 @app.route("/api/games")
 def games():
     global latest_games
@@ -302,6 +308,16 @@ def api_game_history():
     if gid is None:
         return jsonify([]), 400
     return jsonify(db.game_history(gid))
+
+
+@app.route("/api/history/records")
+def api_history_records():
+    """Retorna registros brutos do historico."""
+    start = request.args.get("start")
+    end = request.args.get("end")
+    gid = request.args.get("game_id", type=int)
+    name = request.args.get("name")
+    return jsonify(db.history_records(start, end, gid, name))
 
 
 @app.route("/api/search-rtp", methods=["POST"])
