@@ -10,7 +10,7 @@ let gameModal;
 let modalGameId = null;
 let socket;
 let socketGames = [];
-let searchInterval = null;
+let searchTimeout;
 let isSearching = false;
 let currentQuery = '';
 let modalInterval = null;
@@ -650,7 +650,7 @@ function filterAndRender() {
 
 const handleSearchInput = debounce(async () => {
     const termo = document.getElementById('search-input')?.value.trim();
-    clearInterval(searchInterval);
+    clearTimeout(searchTimeout);
     isSearching = !!termo;
     currentQuery = termo || '';
     if (isSearching) {
@@ -662,9 +662,9 @@ const handleSearchInput = debounce(async () => {
             filterAndRender();
         } else {
             await fetchAndDisplaySearch(currentQuery);
-            searchInterval = setInterval(
+            searchTimeout = setTimeout(
                 () => fetchAndDisplaySearch(currentQuery),
-                1000
+                5000
             );
         }
     } else {
