@@ -69,11 +69,14 @@
       const params = new URLSearchParams();
       const inicio = document.getElementById('start').value;
       const fim = document.getElementById('end').value;
-      const gidValue = document.getElementById('game-id').value.trim();
+      const gidValue = parseInt(
+        document.getElementById('game-id').value.trim(),
+        10,
+      );
       const nome = document.getElementById('name').value;
       if (inicio) params.append('start', inicio);
       if (fim) params.append('end', fim);
-      if (gidValue) params.append('game_id', gidValue);
+      if (!Number.isNaN(gidValue)) params.append('game_id', gidValue);
       if (nome) params.append('name', nome);
       params.append('casa', document.getElementById('casa').value);
       const resp = await fetch('/api/history/records?' + params.toString());

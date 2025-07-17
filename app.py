@@ -365,7 +365,7 @@ def api_history_records():
     """Retorna registros brutos do historico."""
     start = request.args.get("start")
     end = request.args.get("end")
-    gid = request.args.get("game_id")
+    gid = request.args.get("game_id", type=int)
     name = request.args.get("name")
     casa = request.args.get("casa")
     return jsonify(db.history_records(start, end, gid, name, casa))

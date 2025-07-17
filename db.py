@@ -192,7 +192,7 @@ def game_history(game_id: int, casa: str | None = None) -> list[dict]:
 def history_records(
     start: str | None = None,
     end: str | None = None,
-    game_id: str | None = None,
+    game_id: int | None = None,
     name: str | None = None,
     casa: str | None = None,
 ):
@@ -205,9 +205,9 @@ def history_records(
     if end:
         where.append("timestamp <= %s")
         params.append(end)
-    if game_id:
-        where.append("CAST(game_id AS TEXT) LIKE %s")
-        params.append(f"%{game_id}%")
+    if game_id is not None:
+        where.append("game_id = %s")
+        params.append(game_id)
     if name:
         where.append("lower(name) LIKE %s")
         params.append(f"%{name.lower()}%")
