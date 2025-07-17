@@ -18,6 +18,10 @@
     <div class="row">
       <aside class="col-md-3 col-lg-2 sidebar mb-4">
         <div class="controls p-2 bg-dark rounded">
+          <select id="casa-select" class="form-select mb-2">
+            <option value="cbet">cbet</option>
+            <option value="cgg">cgg</option>
+          </select>
           <input id="search-input" type="text" class="form-control mb-2" placeholder="🔍 Pesquisar por nome" />
           <select id="provider-select" class="form-select mb-2">
             <option value="all">Todos os provedores</option>
@@ -69,5 +73,16 @@
       </main>
     </div>
   </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sel = document.getElementById('casa-select');
+      if (!sel) return;
+      sel.value = window.HOUSE;
+      sel.addEventListener('change', () => {
+        const casa = sel.value;
+        window.location.href = `/melhores?casa=${casa}`;
+      });
+    });
+  </script>
 </body>
 </html>
