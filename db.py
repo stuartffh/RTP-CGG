@@ -22,6 +22,7 @@ def init_db():
             rtp REAL,
             extra BIGINT,
             rtp_status TEXT,
+            casa TEXT DEFAULT 'cbet',
             timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         )"""
         )
@@ -38,6 +39,16 @@ def init_db():
                 "UPDATE rtp_history SET rtp_status = CASE WHEN extra IS NULL "
                 "THEN 'neutral' WHEN extra < 0 THEN 'down' ELSE 'up' END"
             )
+        # garante que a coluna casa exista em bancos legados
+        cur.execute(
+            """
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name='rtp_history' AND column_name='casa'
+            """
+        )
+        if cur.fetchone() is None:
+            cur.execute("ALTER TABLE rtp_history ADD COLUMN casa TEXT DEFAULT 'cbet'")
+            cur.execute("UPDATE rtp_history SET casa = 'cbet'")
         conn.commit()
 
 
@@ -79,11 +90,12 @@ def insert_games(games: list[dict]):
                         rtp,
                         extra,
                         status,
+                        "cbet",
                     )
                 )
         if records:
             cur.executemany(
-                "INSERT INTO rtp_history (game_id, name, provider, rtp, extra, rtp_status) VALUES (%s, %s, %s, %s, %s, %s)",
+                "INSERT INTO rtp_history (game_id, name, provider, rtp, extra, rtp_status, casa) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                 records,
             )
             conn.commit()
