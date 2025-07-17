@@ -214,7 +214,7 @@ async function fetchGames(showSpinner = false) {
 
     try {
         if (spinner && showSpinner) spinner.classList.remove('d-none');
-        const response = await fetch('/api/games');
+        const response = await fetch(`/api/games/${window.HOUSE}`);
         if (!response.ok) throw new Error('Erro na resposta da rede');
 
         const data = await response.json();
@@ -240,7 +240,7 @@ async function fetchMelhores(showSpinner = false) {
 
     try {
         if (spinner && showSpinner) spinner.classList.remove('d-none');
-        const response = await fetch('/api/melhores');
+        const response = await fetch(`/api/melhores/${window.HOUSE}`);
         if (!response.ok) throw new Error('Erro na resposta da rede');
         const data = await response.json();
         handleGamesData(data);
@@ -260,7 +260,7 @@ async function fetchMelhores(showSpinner = false) {
 
 async function fetchRtpAtual(nome) {
     try {
-        const resposta = await fetch('/api/search-rtp', {
+        const resposta = await fetch(`/api/search-rtp/${window.HOUSE}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ names: [nome] }),
@@ -287,7 +287,7 @@ async function fetchAndDisplaySearch(query) {
 
 async function fetchWinners() {
     try {
-        const res = await fetch("/api/last-winners");
+        const res = await fetch(`/api/last-winners/${window.HOUSE}`);
         if (!res.ok) throw new Error("Falha na rede");
         const data = await res.json();
         const winners = Array.isArray(data) ? data : data.items || [];
@@ -315,7 +315,11 @@ async function fetchWinners() {
 
 function connectSocket() {
     socket = io();
-    socket.on('games_update', data => handleGamesData(data));
+    socket.on('games_update', payload => {
+        if (payload.casa === window.HOUSE) {
+            handleGamesData(payload.games);
+        }
+    });
 }
 
 
@@ -323,7 +327,7 @@ function fillGameModal(game) {
     document.getElementById('gameModalLabel').textContent = game.name;
     const imgEl = document.getElementById('gameModalImg');
     if (imgEl) {
-        imgEl.src = `${IMAGE_ENDPOINT}/${game.id}.webp`;
+        imgEl.src = `${IMAGE_ENDPOINT}/${game.id}.webp?casa=${window.HOUSE}`;
         imgEl.alt = `Imagem de ${game.name}`;
     }
     const provEl = document.getElementById('gameModalProvider');
@@ -513,7 +517,7 @@ function displayGames(games) {
 
     games.forEach(game => {
         present.add(game.id);
-        const imgUrl = `${IMAGE_ENDPOINT}/${game.id}.webp`;
+        const imgUrl = `${IMAGE_ENDPOINT}/${game.id}.webp?casa=${window.HOUSE}`;
         const rtpStatus = game.rtp_status || 'neutral';
         const dailyBadge = {
             down: '<span class="badge bg-danger rtp-badge">▼ Dia</span>',
