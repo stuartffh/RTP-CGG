@@ -143,6 +143,8 @@ function applyPriorities(games) {
 }
 
 function checkUnidadesAlerts() {
+    if (!Array.isArray(gamesData)) return;
+
     gamesData.forEach(g => {
         const val = typeof g.extra === 'number' ? g.extra : null;
         if (val === null) return;
@@ -168,6 +170,7 @@ function checkUnidadesAlerts() {
         }
     });
 }
+
 
 function handleGamesData(data) {
     const processed = window.IS_MELHORES_PAGE ? applyPriorities(data) : data;
