@@ -1,5 +1,7 @@
 import os
 import urllib3
+import eventlet
+eventlet.monkey_patch()
 from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
 from flask import send_file, abort
@@ -14,7 +16,7 @@ from google.protobuf.json_format import MessageToDict
 import db
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
 
 CASAS = {"cbet": "https://cbet.gg.br", "cgg": "https://cgg.bet"}
 
