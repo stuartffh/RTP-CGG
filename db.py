@@ -181,10 +181,11 @@ def history_records(
     end: str | None = None,
     game_id: str | None = None,
     name: str | None = None,
+    casa: str = "cbet",
 ):
     """Retorna registros filtrados da tabela rtp_history."""
-    where = []
-    params: list = []
+    where = ["casa = %s"]
+    params: list = [casa]
     if start:
         where.append("timestamp >= %s")
         params.append(start)
