@@ -32,6 +32,10 @@
       <!-- Sidebar com filtros -->
       <aside class="col-md-3 col-lg-2 sidebar mb-4">
         <div class="controls p-2 bg-dark rounded">
+          <select id="casa-select" class="form-select mb-2">
+            <option value="cbet">cbet</option>
+            <option value="cgg">cgg</option>
+          </select>
           <input
             id="search-input"
             type="text"
@@ -251,5 +255,16 @@
       </div>
     </div>
   </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sel = document.getElementById('casa-select');
+      if (!sel) return;
+      sel.value = window.HOUSE;
+      sel.addEventListener('change', () => {
+        const casa = sel.value;
+        window.location.href = casa === 'cgg' ? '/cgg' : '/';
+      });
+    });
+  </script>
 </body>
 </html>
