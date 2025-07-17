@@ -17,7 +17,7 @@ Consulte o arquivo `agents.md` para detalhes sobre os agentes da aplicação. At
 
 - `GET /api/games` – retorna jogos consultando `/live-rtp`.
 - `GET /api/melhores` – prioriza jogos por desempenho.
-- `POST /api/search-rtp` – pesquisa jogos enviando ao endpoint `/live-rtp/search` do site cbet.gg.br e, caso falhe, filtra a lista localmente. Utiliza headers `accept`, `content-type`, `x-language-iso`, `origin` e `referer`. A requisição respeita a variável `VERIFY_SSL` para definir se o certificado TLS será verificado.
+- `POST /api/search-rtp` – pesquisa jogos enviando ao endpoint `/live-rtp/search` do site cgg.bet.br e, caso falhe, filtra a lista localmente. Utiliza headers `accept`, `content-type`, `x-language-iso`, `origin` e `referer`. A requisição respeita a variável `VERIFY_SSL` para definir se o certificado TLS será verificado.
 - `GET /api/last-winners` – obtém os últimos vencedores do cassino.
 - `GET /api/history` – recupera registros da tabela `rtp_history` no banco definido em `DATABASE_URL`.
 - A tela de busca utiliza `/api/search-rtp` diretamente, atualizando os dados após a pesquisa e tentando novamente após alguns segundos quando necessário.

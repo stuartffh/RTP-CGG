@@ -22,7 +22,7 @@ def init_db():
             rtp REAL,
             extra BIGINT,
             rtp_status TEXT,
-            casa TEXT DEFAULT 'cbet',
+            casa TEXT DEFAULT 'cgg',
             timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
         )"""
         )
@@ -47,8 +47,8 @@ def init_db():
             """
         )
         if cur.fetchone() is None:
-            cur.execute("ALTER TABLE rtp_history ADD COLUMN casa TEXT DEFAULT 'cbet'")
-            cur.execute("UPDATE rtp_history SET casa = 'cbet'")
+            cur.execute("ALTER TABLE rtp_history ADD COLUMN casa TEXT DEFAULT 'cgg'")
+            cur.execute("UPDATE rtp_history SET casa = 'cgg'")
         conn.commit()
 
 
@@ -90,7 +90,7 @@ def insert_games(games: list[dict]):
                         rtp,
                         extra,
                         status,
-                        "cbet",
+                        "cgg",
                     )
                 )
         if records:
@@ -181,7 +181,7 @@ def history_records(
     end: str | None = None,
     game_id: str | None = None,
     name: str | None = None,
-    casa: str = "cbet",
+    casa: str = "cgg",
 ):
     """Retorna registros filtrados da tabela rtp_history."""
     where = ["casa = %s"]
