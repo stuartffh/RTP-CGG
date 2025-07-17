@@ -254,7 +254,13 @@ def search_local(names: list[str], casa: str = "cbet"):
     queries = [str(n).lower() for n in names]
     global latest_games
     if not latest_games[casa]:
-        latest_games[casa] = fetch_games_data(casa)
+        try:
+            latest_games[casa] = fetch_games_data(casa)
+        except requests.RequestException as exc:
+            if DEBUG_REQUESTS:
+                print("[DEBUG] Erro ao buscar jogos localmente")
+                print(exc)
+            latest_games[casa] = []
     return [
         g for g in latest_games[casa] if any(q in g["name"].lower() for q in queries)
     ]
@@ -294,7 +300,13 @@ def historico_registros():
 @app.route("/api/games/<casa>")
 def games(casa="cbet"):
     global latest_games
-    latest_games[casa] = fetch_games_data(casa)
+    try:
+        latest_games[casa] = fetch_games_data(casa)
+    except requests.RequestException as exc:
+        if DEBUG_REQUESTS:
+            print("[DEBUG] Erro ao buscar jogos")
+            print(exc)
+        return jsonify([]), 500
     return jsonify(latest_games[casa])
 
 
@@ -302,7 +314,13 @@ def games(casa="cbet"):
 @app.route("/api/melhores/<casa>")
 def api_melhores(casa="cbet"):
     global latest_games
-    latest_games[casa] = fetch_games_data(casa)
+    try:
+        latest_games[casa] = fetch_games_data(casa)
+    except requests.RequestException as exc:
+        if DEBUG_REQUESTS:
+            print("[DEBUG] Erro ao buscar melhores jogos")
+            print(exc)
+        return jsonify([]), 500
     return jsonify(prioritize_games(latest_games[casa]))
 
 
@@ -402,7 +420,13 @@ def background_fetch():
     while True:
         try:
             for casa in CASAS:
-                novos = fetch_games_data(casa)
+                try:
+                    novos = fetch_games_data(casa)
+                except requests.RequestException as exc:
+                    if DEBUG_REQUESTS:
+                        print("[DEBUG] Erro ao atualizar jogos")
+                        print(exc)
+                    continue
                 if has_changes(novos, latest_games[casa]):
                     latest_games[casa] = novos
                     db.insert_games(novos, casa)
