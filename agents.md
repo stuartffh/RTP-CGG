@@ -1,10 +1,13 @@
-## Lista de Agentes
+# Repository Guidelines
 
-> **Escopo:** este documento descreve os agentes e integrações do projeto, incluindo permissões e comportamentos. Para diretrizes de instalação e contribuição, consulte `AGENTS.md`.
+> **Escopo:** este documento descreve as regras de instalação, desenvolvimento e verificação do projeto. As informações sobre agentes e integrações estão em `agents.md`.
 
-- **RTP-CGG**: Servidor Flask que exibe o RTP dos jogos em tempo real.
+Consulte o arquivo `agents.md` para detalhes sobre os agentes da aplicação. Atualize este documento apenas com diretrizes de configuração e desenvolvimento do repositório.
 
-- **Analytics**: Registra o histórico de RTP no banco SQLite `rtp.db`, na tabela `rtp_history`, incluindo a coluna `rtp_status` (up, down ou neutral) para exibição na página de analytics.
+## Setup
+- Use **Python 3.12**.
+- Install dependencies with `pip install -r requirements.txt` in a virtual environment.
+- Start the development server using `python app.py`.
 
 - **Analytics**: Registra o histórico de RTP em um banco PostgreSQL definido pela variável `DATABASE_URL`. O endereço padrão é `postgres://postgres:2412055aa@185.44.66.206:5432/vigilancia?sslmode=disable`. Os dados ficam na tabela `rtp_history` para exibição na página de analytics.
 - Ao iniciar, este agente verifica se a coluna `rtp_status` existe e a cria automaticamente caso necessário.
@@ -31,3 +34,11 @@
 ### Permissões
 
 O agente de analytics precisa de permissão de leitura e escrita no banco configurado pela variável `DATABASE_URL`.
+## Development
+- Format Python code with `black` (line length 88).
+- Keep JavaScript concise and avoid duplicates.
+- Store user-facing strings in Portuguese.
+
+## Verification
+- Run `python -m py_compile app.py` to check syntax before committing.
+
