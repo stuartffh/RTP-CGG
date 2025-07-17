@@ -17,11 +17,13 @@ Aplicação Flask que consulta o endpoint `https://cbet.gg.br` e exibe em tempo 
    source venv/bin/activate
    pip install -r requirements.txt
    ```
-2. Inicie o servidor Flask:
+2. Inicie o servidor Flask com suporte a WebSocket:
    ```bash
    python app.py
    ```
-   O serviço ficará disponível em `http://localhost:5000`.
+   Não utilize `flask run`, pois o websocket requer que o servidor do
+   `Flask-SocketIO` seja iniciado. O serviço ficará disponível em
+   `http://localhost:5000`.
 
 ### Utilizando Docker
 
@@ -33,7 +35,11 @@ Aplicação Flask que consulta o endpoint `https://cbet.gg.br` e exibe em tempo 
    ```bash
    docker run -e PORT=5000 -p 5000:5000 rtp-cgg
    ```
-3. Acesse `http://localhost:5000` para visualizar o dashboard.
+3. Acesse `http://localhost:5000` para visualizar o dashboard. Em
+   produção, execute o servidor com:
+   ```bash
+   gunicorn -k eventlet -b 0.0.0.0:5000 wsgi:app
+   ```
 
 Esse mesmo Dockerfile funciona em plataformas como o **EasyPanel**, bastando informar a variável `PORT` caso a hospedagem utilize outra porta padrão.
 
