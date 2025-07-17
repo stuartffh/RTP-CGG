@@ -119,6 +119,8 @@ psql "$DATABASE_URL" -c "ALTER TABLE rtp_history ALTER COLUMN game_id TYPE BIGIN
 psql "$DATABASE_URL" -c "ALTER TABLE rtp_history ALTER COLUMN extra TYPE BIGINT"
 psql "$DATABASE_URL" -c "ALTER TABLE rtp_history ADD COLUMN rtp_status TEXT"
 psql "$DATABASE_URL" -c "UPDATE rtp_history SET rtp_status = CASE WHEN extra IS NULL THEN 'neutral' WHEN extra < 0 THEN 'down' ELSE 'up' END"
+psql "$DATABASE_URL" -c "ALTER TABLE rtp_history ADD COLUMN casa TEXT DEFAULT 'cbet'"
+psql "$DATABASE_URL" -c "UPDATE rtp_history SET casa = 'cbet'"
 ```
 
 
