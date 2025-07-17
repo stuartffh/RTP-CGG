@@ -32,7 +32,11 @@
       </div>
       <div class="col-md-3 text-end">
         <button id="btn-filtrar" class="btn btn-success">Filtrar</button>
+        {% if house == 'cgg' %}
+        <a href="/cgg" class="btn btn-secondary">Voltar</a>
+        {% else %}
         <a href="/" class="btn btn-secondary">Voltar</a>
+        {% endif %}
       </div>
     </div>
     <div class="table-responsive">

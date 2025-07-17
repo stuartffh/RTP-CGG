@@ -18,7 +18,11 @@
         <option value="cgg">cgg</option>
       </select>
       <select id="game-select" class="form-select"></select>
+      {% if house == 'cgg' %}
+      <a href="/cgg" class="btn btn-secondary">Voltar</a>
+      {% else %}
       <a href="/" class="btn btn-secondary">Voltar</a>
+      {% endif %}
     </div>
     <canvas id="chart" class="mb-4"></canvas>
     <table class="table table-dark table-striped" id="history-table">
