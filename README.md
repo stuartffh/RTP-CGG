@@ -79,6 +79,18 @@ VERIFY_SSL=false python app.py
 python app.py --insecure
 ```
 
+O domínio `cgg.bet` pode apresentar um certificado que não corresponde ao
+endereço. Com `VERIFY_SSL=true`, a biblioteca `requests` lança
+`requests.exceptions.SSLError`. Para consultar esse site, desative a verificação
+e indique a casa `cgg` nos endpoints:
+
+```bash
+VERIFY_SSL=false python app.py
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"names":["Wisdom of Athena"]}' \
+  http://localhost:5000/api/search-rtp/cgg
+```
+
 Utilize essa opção apenas em cenários de desenvolvimento ou testes.
 
 
