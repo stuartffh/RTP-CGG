@@ -3,82 +3,252 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>📑 Histórico Completo</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
+  <title>🎰 RTP dos Jogos - Tempo Real</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style.css') }}"
+  />
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    defer
+  ></script>
+  <script
+    src="https://cdn.socket.io/4.7.2/socket.io.min.js"
+    defer
+  ></script>
+  <script
+    src="{{ url_for('static', filename='script.js') }}"
+    defer
+  ></script>
 </head>
 <body>
-  <div class="container py-3">
-    <div class="mb-3 row g-2">
-      <div class="col-md-2">
-        <input type="date" id="start" class="form-control" />
-      </div>
-      <div class="col-md-2">
-        <input type="date" id="end" class="form-control" />
-      </div>
-      <div class="col-md-2">
-        <input type="number" id="game-id" class="form-control" placeholder="ID do jogo" />
-      </div>
-      <div class="col-md-3">
-        <input type="text" id="name" class="form-control" placeholder="Nome do jogo" />
-      </div>
-      <div class="col-md-3 text-end">
-        <button id="btn-filtrar" class="btn btn-success">Filtrar</button>
-        <a href="/" class="btn btn-secondary">Voltar</a>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar com filtros -->
+      <aside class="col-md-3 col-lg-2 sidebar mb-4">
+        <div class="controls p-2 bg-dark rounded">
+          <input
+            id="search-input"
+            type="text"
+            class="form-control mb-2"
+            placeholder="🔍 Pesquisar por nome"
+          />
+          <select id="provider-select" class="form-select mb-2">
+            <option value="all">Todos os provedores</option>
+          </select>
+          <input
+            id="min-rtp"
+            type="number"
+            step="0.01"
+            class="form-control mb-2"
+            placeholder="RTP mínimo (%)"
+          />
+          <input
+            id="max-rtp"
+            type="number"
+            step="0.01"
+            class="form-control mb-2"
+            placeholder="RTP máximo (%)"
+          />
+          <input
+            id="min-unidades"
+            type="number"
+            step="1"
+            class="form-control mb-2"
+            placeholder="Unidades mínimas"
+          />
+          <input
+            id="max-unidades"
+            type="number"
+            step="1"
+            class="form-control mb-2"
+            placeholder="Unidades máximas"
+          />
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="show-positive"
+              checked
+            />
+            <label class="form-check-label" for="show-positive">
+              Mostrar RTP Alto
+            </label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="show-negative"
+              checked
+            />
+            <label class="form-check-label" for="show-negative">
+              Mostrar RTP Baixo
+            </label>
+          </div>
+          <div class="form-check mb-2">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              id="show-winners"
+            />
+            <label class="form-check-label" for="show-winners">
+              Mostrar vencedores
+            </label>
+          </div>
+          <input
+            id="alert-name"
+            type="text"
+            class="form-control mb-2"
+            placeholder="Nome do jogo"
+          />
+          <input
+            id="alert-value"
+            type="number"
+            step="0.01"
+            class="form-control mb-2"
+            placeholder="Valor do RTP (%)"
+          />
+          <select id="alert-type" class="form-select mb-2">
+            <option value="up">≥ Acima de</option>
+            <option value="down">≤ Abaixo de</option>
+          </select>
+          <button id="add-alert" class="btn btn-success w-100 mb-2">
+            ➕ Adicionar Alerta
+          </button>
+          <ul id="alerts-list" class="list-group mb-2"></ul>
+          <input
+            id="alert-unidades-pos"
+            type="number"
+            step="1"
+            class="form-control mb-2"
+            placeholder="Unidades positivas (≥)"
+          />
+          <input
+            id="alert-unidades-neg"
+            type="number"
+            step="1"
+            class="form-control mb-2"
+            placeholder="Unidades negativas (≤)"
+          />
+          <button class="btn btn-success w-100 mb-2" onclick="sortBy('rtp')">
+            🔼 Ordenar por RTP
+          </button>
+          <button class="btn btn-info w-100 mb-2" onclick="sortBy('name')">
+            🔤 Ordenar por Nome
+          </button>
+          <button class="btn btn-warning w-100" onclick="fetchGames(true)">
+            🔄 Atualizar Agora
+          </button>
+          <a href="/melhores" class="btn btn-primary w-100 mt-2">🎯 Melhores Jogos</a>
+          <a href="/historico" class="btn btn-secondary w-100 mt-2">📊 Histórico</a>
+          <a href="/historico-registros" class="btn btn-secondary w-100 mt-2">🗂️ Registros</a>
+        </div>
+      </aside>
+
+      <!-- Conteúdo principal -->
+      <main class="col-md-9 col-lg-10">
+        <div
+          id="status-message"
+          class="alert alert-danger d-none mt-3"
+          role="alert"
+        ></div>
+        <div id="loading-spinner" class="d-none my-3">
+          <div class="spinner-border text-light" role="status">
+            <span class="visually-hidden">Carregando...</span>
+          </div>
+        </div>
+        <div id="games-container" class="games-grid"></div>
+        <div id="copy-toast" aria-live="polite"></div>
+        <audio id="alert-sound" preload="auto"></audio>
+      </main>
+    </div>
+
+    <!-- Modal detalhes do jogo -->
+    <div
+      class="modal fade"
+      id="gameModal"
+      tabindex="-1"
+      aria-labelledby="gameModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-dark text-white">
+          <div class="modal-header">
+            <h5 class="modal-title" id="gameModalLabel"></h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Fechar"
+            ></button>
+          </div>
+          <div class="modal-body text-center">
+            <img
+              id="gameModalImg"
+              class="img-fluid mb-3"
+              src=""
+              alt="Imagem do jogo em destaque"
+            />
+            <p id="gameModalProvider" class="mb-2"></p>
+            <div class="d-flex justify-content-center gap-3">
+              <div>
+                <strong id="gameModalDaily"></strong>
+                <span id="gameModalDailyBadge"></span>
+              </div>
+              <div>
+                <strong id="gameModalWeekly"></strong>
+                <span id="gameModalWeeklyBadge"></span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="table-responsive">
-      <table class="table table-dark table-striped" id="records-table">
-        <thead>
-          <tr>
-            <th>Data</th>
-            <th>ID</th>
-            <th>Jogo</th>
-            <th>RTP (%)</th>
-            <th>Unidades</th>
-            <th>Status</th>
-            <th>Provedor</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+
+    <!-- Modal Últimos Vencedores -->
+    <div
+      class="modal fade modal-draggable"
+      id="winnersModal"
+      tabindex="-1"
+      aria-labelledby="winnersModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content bg-dark text-white">
+          <div class="modal-header">
+            <h5 class="modal-title" id="winnersModalLabel">
+              Últimos Vencedores
+            </h5>
+            <button
+              type="button"
+              class="btn btn-sm btn-warning me-2"
+              id="minimize-winners"
+            >_</button>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+              aria-label="Fechar"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <ul id="winners-list" class="list-group"></ul>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >Fechar</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <script>
-    document.getElementById('btn-filtrar').addEventListener('click', carregar);
-    document.addEventListener('DOMContentLoaded', carregar);
-
-    async function carregar() {
-      const params = new URLSearchParams();
-      const inicio = document.getElementById('start').value;
-      const fim = document.getElementById('end').value;
-      const gidValue = document.getElementById('game-id').value.trim();
-      const nome = document.getElementById('name').value;
-      if (inicio) params.append('start', inicio);
-      if (fim) params.append('end', fim);
-      if (gidValue) params.append('game_id', gidValue);
-      if (nome) params.append('name', nome);
-      const resp = await fetch('/api/history/records?' + params.toString());
-      if (!resp.ok) return;
-      const dados = await resp.json();
-      const tbody = document.querySelector('#records-table tbody');
-      tbody.innerHTML = '';
-      for (const row of dados) {
-        const tr = document.createElement('tr');
-        const data = new Date(row.timestamp).toLocaleString();
-        const badge = {
-          down: '<span class="badge bg-danger">▼ Negativo</span>',
-          up: '<span class="badge bg-success">▲ Positivo</span>',
-          neutral: '<span class="badge bg-secondary">▬</span>',
-        }[row.rtp_status || 'neutral'];
-        tr.innerHTML =
-          `<td>${data}</td><td>${row.game_id}</td><td>${row.name}</td>` +
-          `<td>${(Number(row.rtp) / 100).toFixed(2)}</td>` +
-          `<td>${row.extra}</td><td>${badge}</td><td>${row.provider}</td>`;
-        tbody.appendChild(tr);
-      }
-    }
-  </script>
 </body>
 </html>
