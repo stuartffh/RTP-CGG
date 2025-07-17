@@ -8,21 +8,12 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" defer></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-  <script>window.HOUSE="{{ house }}"</script>
 </head>
 <body>
   <div class="container py-3">
     <div class="mb-3 d-flex gap-2">
-      <select id="casa-select" class="form-select">
-        <option value="cbet">cbet</option>
-        <option value="cgg">cgg</option>
-      </select>
       <select id="game-select" class="form-select"></select>
-      {% if house == 'cgg' %}
-      <a href="/cgg" class="btn btn-secondary">Voltar</a>
-      {% else %}
       <a href="/" class="btn btn-secondary">Voltar</a>
-      {% endif %}
     </div>
     <canvas id="chart" class="mb-4"></canvas>
     <table class="table table-dark table-striped" id="history-table">
@@ -40,18 +31,12 @@
   <script>
     document.addEventListener('DOMContentLoaded', init);
     async function init() {
-      const casaSel = document.getElementById('casa-select');
-      casaSel.value = window.HOUSE;
-      casaSel.addEventListener('change', () => {
-        window.HOUSE = casaSel.value;
-        loadGames();
-      });
       await loadGames();
       document.getElementById('game-select').addEventListener('change', loadHistory);
     }
 
     async function loadGames() {
-      const resp = await fetch(`/api/history/games?casa=${window.HOUSE}`);
+      const resp = await fetch('/api/history/games');
       if (!resp.ok) return;
       const games = await resp.json();
       const select = document.getElementById('game-select');
@@ -71,7 +56,7 @@
     async function loadHistory() {
       const gid = document.getElementById('game-select').value;
       if (!gid) return;
-      const resp = await fetch(`/api/game-history?game_id=${gid}&casa=${window.HOUSE}`);
+      const resp = await fetch(`/api/game-history?game_id=${gid}`);
       if (!resp.ok) return;
       const data = await resp.json();
       renderTable(data);
