@@ -60,9 +60,10 @@ def insert_games(games: list[dict], casa: str):
             game_id = game.get("id")
             if game_id is None:
                 continue
+            casa_val = game.get("casa", casa)
             cur.execute(
                 "SELECT rtp, extra FROM rtp_history WHERE game_id=%s AND casa=%s ORDER BY timestamp DESC LIMIT 4",
-                (game_id, casa),
+                (game_id, casa_val),
             )
             recent = cur.fetchall()
             rtp = game.get("rtp")
@@ -89,7 +90,7 @@ def insert_games(games: list[dict], casa: str):
                         rtp,
                         extra,
                         status,
-                        casa,
+                        casa_val,
                     )
                 )
         if records:

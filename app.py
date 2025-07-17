@@ -176,6 +176,7 @@ def fetch_games_data(casa: str = "cbet"):
     week_map = {g["id"]: g for g in games_weekly}
 
     for game in games:
+        game["casa"] = casa
         extra = game.get("extra")
         if extra is not None:
             game["extra"] = decode_signed(int(extra))
@@ -231,6 +232,7 @@ def fetch_games_by_name(names: list[str], casa: str = "cbet"):
             decoded.ParseFromString(resp.content)
             games = MessageToDict(decoded).get("games", [])
             for game in games:
+                game["casa"] = casa
                 extra = game.get("extra")
                 if extra is not None:
                     game["extra"] = decode_signed(int(extra))
