@@ -16,7 +16,7 @@ import db
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-CASAS = {"cbet": "https://cbet.gg", "cgg": "https://cgg.bet"}
+CASAS = {"cbet": "https://cbet.gg.br", "cgg": "https://cgg.bet"}
 
 DEBUG_REQUESTS = os.environ.get("DEBUG_REQUESTS", "false").lower() in (
     "1",
