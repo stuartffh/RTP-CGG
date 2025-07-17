@@ -1,5 +1,7 @@
 import os
 import urllib3
+import eventlet
+eventlet.monkey_patch()
 from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
 from flask import send_file, abort
@@ -14,7 +16,9 @@ from google.protobuf.json_format import MessageToDict
 import db
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+
+CASAS = {"cbet": "https://cbet.gg.br", "cgg": "https://cgg.bet"}
 
 DEBUG_REQUESTS = os.environ.get("DEBUG_REQUESTS", "false").lower() in (
     "1",
@@ -32,20 +36,28 @@ VERIFY_SSL = os.environ.get("VERIFY_SSL", "true").lower() not in (
 )
 REQUEST_TIMEOUT = 10
 
-url = "https://cbet.gg/casinogo/widgets/v2/live-rtp"
-search_url = "https://cbet.gg/casinogo/widgets/v2/live-rtp/search"
-headers = {
+HEADERS_TEMPLATE = {
     "accept": "application/x-protobuf",
     "content-type": "application/x-protobuf",
     "accept-language": "pt-BR",
     "user-agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) "
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0 "
         "Gecko/20100101 Firefox/140.0"
     ),
     "x-language-iso": "pt-BR",
-    "origin": "https://cbet.gg",
-    "referer": "https://cbet.gg/pt-BR/casinos/casino/lobby",
 }
+
+
+def build_urls_headers(casa: str):
+    base = CASAS.get(casa, CASAS["cbet"])
+    url = f"{base}/casinogo/widgets/v2/live-rtp"
+    search_url = f"{base}/casinogo/widgets/v2/live-rtp/search"
+    headers = HEADERS_TEMPLATE.copy()
+    headers["origin"] = base
+    headers["referer"] = f"{base}/pt-BR/casinos/casino/lobby"
+    return url, search_url, headers
+
+
 data = b"\x08\x01\x10\x02"
 data_weekly = b"\x08\x02\x10\x02"
 
@@ -86,7 +98,7 @@ def get_protobuf_message():
 
 ProtobufMessage = get_protobuf_message()
 
-latest_games = []
+latest_games = {"cbet": [], "cgg": []}
 
 
 def decode_signed(value):
@@ -123,7 +135,8 @@ def has_changes(novos, antigos):
     return False
 
 
-def fetch_games_data():
+def fetch_games_data(casa: str = "cbet"):
+    url, _, headers = build_urls_headers(casa)
     if DEBUG_REQUESTS:
         print("\n[DEBUG] >>> Enviando Requisição <<<")
         print(f"[DEBUG] URL: {url}")
@@ -165,6 +178,7 @@ def fetch_games_data():
     week_map = {g["id"]: g for g in games_weekly}
 
     for game in games:
+        game["casa"] = casa
         extra = game.get("extra")
         if extra is not None:
             game["extra"] = decode_signed(int(extra))
@@ -192,11 +206,12 @@ def fetch_games_data():
     return games
 
 
-def fetch_games_by_name(names: list[str]):
+def fetch_games_by_name(names: list[str], casa: str = "cbet"):
     results = []
     for name in names:
         body = b"\x02\x10\x19\x12" + len(name).to_bytes(1, "little") + name.encode()
 
+        url, search_url, headers = build_urls_headers(casa)
         if DEBUG_REQUESTS:
             print("\n[DEBUG] >>> Enviando Busca RTP <<<")
             print(f"[DEBUG] URL: {search_url}")
@@ -219,6 +234,7 @@ def fetch_games_by_name(names: list[str]):
             decoded.ParseFromString(resp.content)
             games = MessageToDict(decoded).get("games", [])
             for game in games:
+                game["casa"] = casa
                 extra = game.get("extra")
                 if extra is not None:
                     game["extra"] = decode_signed(int(extra))
@@ -238,47 +254,78 @@ def fetch_games_by_name(names: list[str]):
     return results
 
 
-def search_local(names: list[str]):
+def search_local(names: list[str], casa: str = "cbet"):
     queries = [str(n).lower() for n in names]
     global latest_games
-    if not latest_games:
-        latest_games = fetch_games_data()
-    return [g for g in latest_games if any(q in g["name"].lower() for q in queries)]
+    if not latest_games[casa]:
+        try:
+            latest_games[casa] = fetch_games_data(casa)
+        except requests.RequestException as exc:
+            if DEBUG_REQUESTS:
+                print("[DEBUG] Erro ao buscar jogos localmente")
+                print(exc)
+            latest_games[casa] = []
+    return [
+        g for g in latest_games[casa] if any(q in g["name"].lower() for q in queries)
+    ]
 
 
 @app.route("/")
+@app.route("/cbet")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", house="cbet")
+
+
+@app.route("/cgg")
+def index_cgg():
+    return render_template("index.html", house="cgg")
 
 
 @app.route("/melhores")
 def melhores():
-    return render_template("melhores.html")
+    casa = request.args.get("casa", "cbet")
+    return render_template("melhores.html", house=casa)
 
 
 @app.route("/historico")
 def historico():
-    return render_template("historico.html")
+    casa = request.args.get("casa", "cbet")
+    return render_template("historico.html", house=casa)
 
 
 @app.route("/historico-registros")
 def historico_registros():
     """Página de histórico em formato de grade."""
-    return render_template("historico_grid.html")
+    casa = request.args.get("casa", "cbet")
+    return render_template("historico_grid.html", house=casa)
 
 
 @app.route("/api/games")
-def games():
+@app.route("/api/games/<casa>")
+def games(casa="cbet"):
     global latest_games
-    latest_games = fetch_games_data()
-    return jsonify(latest_games)
+    try:
+        latest_games[casa] = fetch_games_data(casa)
+    except requests.RequestException as exc:
+        if DEBUG_REQUESTS:
+            print("[DEBUG] Erro ao buscar jogos")
+            print(exc)
+        return jsonify([]), 500
+    return jsonify(latest_games[casa])
 
 
 @app.route("/api/melhores")
-def api_melhores():
+@app.route("/api/melhores/<casa>")
+def api_melhores(casa="cbet"):
     global latest_games
-    latest_games = fetch_games_data()
-    return jsonify(prioritize_games(latest_games))
+    try:
+        latest_games[casa] = fetch_games_data(casa)
+    except requests.RequestException as exc:
+        if DEBUG_REQUESTS:
+            print("[DEBUG] Erro ao buscar melhores jogos")
+            print(exc)
+        return jsonify([]), 500
+    return jsonify(prioritize_games(latest_games[casa]))
 
 
 @app.route("/api/history")
@@ -286,12 +333,13 @@ def api_history():
     period = request.args.get("period", "daily")
     game_id = request.args.get("game_id")
     name = request.args.get("name")
+    casa = request.args.get("casa")
     try:
         gid = int(game_id) if game_id is not None else None
     except ValueError:
         return jsonify([]), 400
     try:
-        return jsonify(db.query_history(period, game_id=gid, name=name))
+        return jsonify(db.query_history(period, game_id=gid, name=name, casa=casa))
     except ValueError:
         return jsonify([]), 400
 
@@ -299,7 +347,8 @@ def api_history():
 @app.route("/api/history/games")
 def api_history_games():
     """Lista jogos disponíveis no histórico."""
-    return jsonify(db.list_games())
+    casa = request.args.get("casa")
+    return jsonify(db.list_games(casa))
 
 
 @app.route("/api/game-history")
@@ -307,7 +356,8 @@ def api_game_history():
     gid = request.args.get("game_id", type=int)
     if gid is None:
         return jsonify([]), 400
-    return jsonify(db.game_history(gid))
+    casa = request.args.get("casa")
+    return jsonify(db.game_history(gid, casa))
 
 
 @app.route("/api/history/records")
@@ -315,20 +365,22 @@ def api_history_records():
     """Retorna registros brutos do historico."""
     start = request.args.get("start")
     end = request.args.get("end")
-    gid = request.args.get("game_id")
+    gid = request.args.get("game_id", type=int)
     name = request.args.get("name")
-    return jsonify(db.history_records(start, end, gid, name))
+    casa = request.args.get("casa")
+    return jsonify(db.history_records(start, end, gid, name, casa))
 
 
 @app.route("/api/search-rtp", methods=["POST"])
-def api_search_rtp():
+@app.route("/api/search-rtp/<casa>", methods=["POST"])
+def api_search_rtp(casa="cbet"):
     try:
         names = request.get_json(force=True).get("names", [])
         if not isinstance(names, list):
             return jsonify([])
-        games = fetch_games_by_name([str(n) for n in names])
+        games = fetch_games_by_name([str(n) for n in names], casa)
         if not games:
-            games = search_local(names)
+            games = search_local(names, casa)
         return jsonify(games)
     except Exception as exc:
         if DEBUG_REQUESTS:
@@ -339,9 +391,11 @@ def api_search_rtp():
 
 @app.route("/imagens/<int:game_id>.webp")
 def cached_image(game_id):
+    casa = request.args.get("casa", "cbet")
     file_path = os.path.join(IMAGE_CACHE_DIR, f"{game_id}.webp")
     if not os.path.exists(file_path):
-        remote_url = f"https://cbet.gg/static/v1/casino/game/0/{game_id}/big.webp"
+        base = CASAS.get(casa, CASAS["cbet"])
+        remote_url = f"{base}/static/v1/casino/game/0/{game_id}/big.webp"
         try:
             resp = requests.get(remote_url, verify=VERIFY_SSL, timeout=10)
             resp.raise_for_status()
@@ -360,27 +414,37 @@ def cached_image(game_id):
 
 @socketio.on("connect")
 def handle_connect():
-    if latest_games:
-        emit("games_update", latest_games)
+    for casa, games in latest_games.items():
+        if games:
+            emit("games_update", {"casa": casa, "games": games})
 
 
 def background_fetch():
     global latest_games
     while True:
         try:
-            novos = fetch_games_data()
-            if has_changes(novos, latest_games):
-                latest_games = novos
-                db.insert_games(latest_games)
-                socketio.emit("games_update", latest_games)
+            for casa in CASAS:
+                try:
+                    novos = fetch_games_data(casa)
+                except requests.RequestException as exc:
+                    if DEBUG_REQUESTS:
+                        print("[DEBUG] Erro ao atualizar jogos")
+                        print(exc)
+                    continue
+                if has_changes(novos, latest_games[casa]):
+                    latest_games[casa] = novos
+                    db.insert_games(novos, casa)
+                    socketio.emit("games_update", {"casa": casa, "games": novos})
         finally:
             socketio.sleep(3)
 
 
 @app.route("/api/last-winners")
-def last_winners():
-    winners_url = "https://cbet.gg/casinogo/widgets/last-winners"
-    winners_headers = headers.copy()
+@app.route("/api/last-winners/<casa>")
+def last_winners(casa="cbet"):
+    base = CASAS.get(casa, CASAS["cbet"])
+    winners_url = f"{base}/casinogo/widgets/last-winners"
+    _, _, winners_headers = build_urls_headers(casa)
     winners_headers["accept"] = "application/json"
 
     try:

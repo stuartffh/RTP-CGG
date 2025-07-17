@@ -1,6 +1,6 @@
 # RTP-CGG
 
-Aplicação Flask que consulta o endpoint `https://cbet.gg` e exibe em tempo real o RTP (Return to Player) dos jogos de cassino.
+Aplicação Flask que consulta o endpoint `https://cbet.gg.br` e exibe em tempo real o RTP (Return to Player) dos jogos de cassino.
 
 ## Pré-requisitos
 
@@ -17,11 +17,13 @@ Aplicação Flask que consulta o endpoint `https://cbet.gg` e exibe em tempo rea
    source venv/bin/activate
    pip install -r requirements.txt
    ```
-2. Inicie o servidor Flask:
+2. Inicie o servidor Flask com suporte a WebSocket:
    ```bash
    python app.py
    ```
-   O serviço ficará disponível em `http://localhost:5000`.
+   Não utilize `flask run`, pois o websocket requer que o servidor do
+   `Flask-SocketIO` seja iniciado. O serviço ficará disponível em
+   `http://localhost:5000`.
 
 ### Utilizando Docker
 
@@ -33,7 +35,11 @@ Aplicação Flask que consulta o endpoint `https://cbet.gg` e exibe em tempo rea
    ```bash
    docker run -e PORT=5000 -p 5000:5000 rtp-cgg
    ```
-3. Acesse `http://localhost:5000` para visualizar o dashboard.
+3. Acesse `http://localhost:5000` para visualizar o dashboard. Em
+   produção, execute o servidor com:
+   ```bash
+   gunicorn -k eventlet -b 0.0.0.0:5000 wsgi:app
+   ```
 
 Esse mesmo Dockerfile funciona em plataformas como o **EasyPanel**, bastando informar a variável `PORT` caso a hospedagem utilize outra porta padrão.
 
@@ -77,6 +83,18 @@ ou utilize a flag `--insecure`:
 VERIFY_SSL=false python app.py
 # ou
 python app.py --insecure
+```
+
+O domínio `cgg.bet` pode apresentar um certificado que não corresponde ao
+endereço. Com `VERIFY_SSL=true`, a biblioteca `requests` lança
+`requests.exceptions.SSLError`. Para consultar esse site, desative a verificação
+e indique a casa `cgg` nos endpoints:
+
+```bash
+VERIFY_SSL=false python app.py
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"names":["Wisdom of Athena"]}' \
+  http://localhost:5000/api/search-rtp/cgg
 ```
 
 Utilize essa opção apenas em cenários de desenvolvimento ou testes.
