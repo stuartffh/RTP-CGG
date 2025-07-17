@@ -31,5 +31,3 @@
 ### Permissões
 
 O agente de analytics precisa de permissão de leitura e escrita no banco configurado pela variável `DATABASE_URL`.
-
-
