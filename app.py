@@ -267,6 +267,12 @@ def historico_registros():
     return render_template("historico_grid.html")
 
 
+@app.route("/registro-extra")
+def registro_extra():
+    """Página que exibe jogos filtrados pela média de unidades."""
+    return render_template("registro_extra.html")
+
+
 @app.route("/api/games")
 def games():
     global latest_games
@@ -318,6 +324,17 @@ def api_history_records():
     gid = request.args.get("game_id")
     name = request.args.get("name")
     return jsonify(db.history_records(start, end, gid, name))
+
+
+@app.route("/api/registro-extra")
+def api_registro_extra():
+    """Retorna jogos filtrados pela média de unidades."""
+    start = request.args.get("dataInicial")
+    end = request.args.get("dataFinal")
+    extra = request.args.get("extra", type=int)
+    if not start or not end or extra is None:
+        return jsonify([]), 400
+    return jsonify(db.games_by_extra(start, end, extra))
 
 
 @app.route("/api/search-rtp", methods=["POST"])
