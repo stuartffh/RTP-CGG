@@ -19,6 +19,7 @@ let unidadesPosAlert = null;
 let unidadesNegAlert = null;
 const unidadesPosTriggered = new Set();
 const unidadesNegTriggered = new Set();
+const UPDATE_INTERVAL = 3000;
 
 function setupWinnersModal() {
     const modalEl = document.getElementById('winnersModal');
@@ -419,7 +420,7 @@ function openGameModal(id) {
                 if (cardData.prioridade) cardData.prioridade.textContent = updated.prioridade || '';
             }
         }
-    }, 1000);
+    }, UPDATE_INTERVAL);
 }
 
 
@@ -672,7 +673,7 @@ const handleSearchInput = debounce(async () => {
             await fetchAndDisplaySearch(currentQuery);
             searchTimeout = setTimeout(
                 () => fetchAndDisplaySearch(currentQuery),
-                5000
+                UPDATE_INTERVAL
             );
         }
     } else {
@@ -717,7 +718,7 @@ document.addEventListener('click', async (e) => {
             }
             await fetchWinners();
             winnersModal?.show();
-            winnersInterval = setInterval(fetchWinners, 3000);
+            winnersInterval = setInterval(fetchWinners, UPDATE_INTERVAL);
         } else {
             clearInterval(winnersInterval);
             winnersInterval = null;
