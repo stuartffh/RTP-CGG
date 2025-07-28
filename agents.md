@@ -14,7 +14,9 @@ Consulte o arquivo `agents.md` para detalhes sobre os agentes da aplicação. At
 - Ao iniciar, este agente verifica se a coluna `rtp_status` existe e a cria automaticamente caso necessário.
 - `REQUEST_TIMEOUT` define o timeout das requisições RTP.
 - `WINNERS_TIMEOUT` controla o tempo limite do endpoint de vencedores.
-- `RTP_UPDATE_INTERVAL` ajusta a pausa entre atualizações automáticas.
+- `RTP_UPDATE_INTERVAL` ajusta a pausa entre atualizações automáticas. Esse
+  valor também define o intervalo padrão de envio de atualizações pelo
+  websocket.
 
 
 ## Funções e Comportamentos
