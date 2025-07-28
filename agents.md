@@ -8,9 +8,13 @@ Consulte o arquivo `agents.md` para detalhes sobre os agentes da aplicação. At
 - Use **Python 3.12**.
 - Install dependencies with `pip install -r requirements.txt` in a virtual environment.
 - Start the development server using `python app.py`.
+- Variables defined in a `.env` file are loaded automatically.
 
 - **Analytics**: Registra o histórico de RTP em um banco PostgreSQL definido pela variável `DATABASE_URL`. O endereço padrão é `postgres://postgres:2412055aa@185.44.66.206:5432/vigilancia?sslmode=disable`. Os dados ficam na tabela `rtp_history` para exibição na página de analytics.
 - Ao iniciar, este agente verifica se a coluna `rtp_status` existe e a cria automaticamente caso necessário.
+- `REQUEST_TIMEOUT` define o timeout das requisições RTP.
+- `WINNERS_TIMEOUT` controla o tempo limite do endpoint de vencedores.
+- `RTP_UPDATE_INTERVAL` ajusta a pausa entre atualizações automáticas.
 
 
 ## Funções e Comportamentos
