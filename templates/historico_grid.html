@@ -20,6 +20,13 @@
       <div class="col-md-2">
         <input type="number" id="game-id" class="form-control" placeholder="ID do jogo" />
       </div>
+      <div class="col-md-3">
+        <input type="text" id="name" class="form-control" placeholder="Nome do jogo" />
+      </div>
+      <div class="col-md-3 text-end">
+        <button id="btn-filtrar" class="btn btn-success">Filtrar</button>
+        <a href="/" class="btn btn-secondary">Voltar</a>
+      </div>
       <div class="col-md-2">
         <input type="text" id="name" class="form-control" placeholder="Nome do jogo" />
       </div>
@@ -50,6 +57,22 @@
         <tbody></tbody>
       </table>
     </div>
+    <div class="table-responsive">
+      <table class="table table-dark table-striped" id="records-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>ID</th>
+            <th>Jogo</th>
+            <th>RTP (%)</th>
+            <th>Unidades</th>
+            <th>Status</th>
+            <th>Provedor</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
   <script>
     document.getElementById('btn-filtrar').addEventListener('click', carregar);
@@ -57,12 +80,6 @@
 
     async function carregar() {
       const params = new URLSearchParams();
-      const inicio = document.getElementById('start').value;
-      const fim = document.getElementById('end').value;
-      const gidValue = document.getElementById('game-id').value.trim();
-      const nome = document.getElementById('name').value;
-      const provedor = document.getElementById('provider').value;
-      const unidades = document.getElementById('extra').value.trim();
       if (inicio) params.append('start', inicio);
       if (fim) params.append('end', fim);
       if (gidValue) params.append('game_id', gidValue);

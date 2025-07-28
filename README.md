@@ -1,6 +1,6 @@
 # RTP-CGG
 
-Aplicação Flask que consulta o endpoint `https://cbet.gg.br` e exibe em tempo real o RTP (Return to Player) dos jogos de cassino.
+Aplicação Flask que consulta o endpoint `https://cgg.bet.br` e exibe em tempo real o RTP (Return to Player) dos jogos de cassino.
 
 ## Pré-requisitos
 
@@ -123,8 +123,8 @@ psql "$DATABASE_URL" -c "ALTER TABLE rtp_history ALTER COLUMN game_id TYPE BIGIN
 psql "$DATABASE_URL" -c "ALTER TABLE rtp_history ALTER COLUMN extra TYPE BIGINT"
 psql "$DATABASE_URL" -c "ALTER TABLE rtp_history ADD COLUMN rtp_status TEXT"
 psql "$DATABASE_URL" -c "UPDATE rtp_history SET rtp_status = CASE WHEN extra IS NULL THEN 'neutral' WHEN extra < 0 THEN 'down' ELSE 'up' END"
-psql "$DATABASE_URL" -c "ALTER TABLE rtp_history ADD COLUMN casa TEXT DEFAULT 'cbet'"
-psql "$DATABASE_URL" -c "UPDATE rtp_history SET casa = 'cbet'"
+psql "$DATABASE_URL" -c "ALTER TABLE rtp_history ADD COLUMN casa TEXT DEFAULT 'cgg'"
+psql "$DATABASE_URL" -c "UPDATE rtp_history SET casa = 'cgg'"
 ```
 
 

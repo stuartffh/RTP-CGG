@@ -36,8 +36,8 @@ REQUEST_TIMEOUT = float(os.environ.get("REQUEST_TIMEOUT", "10"))
 WINNERS_TIMEOUT = float(os.environ.get("WINNERS_TIMEOUT", str(REQUEST_TIMEOUT)))
 RTP_UPDATE_INTERVAL = float(os.environ.get("RTP_UPDATE_INTERVAL", "3"))
 
-url = "https://cbet.gg/casinogo/widgets/v2/live-rtp"
-search_url = "https://cbet.gg/casinogo/widgets/v2/live-rtp/search"
+url = "https://cgg.bet.br/casinogo/widgets/v2/live-rtp"
+search_url = "https://cgg.bet.br/casinogo/widgets/v2/live-rtp/search"
 headers = {
     "accept": "application/x-protobuf",
     "content-type": "application/x-protobuf",
@@ -47,8 +47,8 @@ headers = {
         "Gecko/20100101 Firefox/140.0"
     ),
     "x-language-iso": "pt-BR",
-    "origin": "https://cbet.gg",
-    "referer": "https://cbet.gg/pt-BR/casinos/casino/lobby",
+    "origin": "https://cgg.bet.br",
+    "referer": "https://cgg.bet.br/pt-BR/casinos/casino/lobby",
 }
 data = b"\x08\x01\x10\x02"
 data_weekly = b"\x08\x02\x10\x02"
@@ -364,7 +364,7 @@ def api_search_rtp():
 def cached_image(game_id):
     file_path = os.path.join(IMAGE_CACHE_DIR, f"{game_id}.webp")
     if not os.path.exists(file_path):
-        remote_url = f"https://cbet.gg/static/v1/casino/game/0/{game_id}/big.webp"
+        remote_url = f"https://cgg.bet.br/static/v1/casino/game/0/{game_id}/big.webp"
         try:
             resp = requests.get(remote_url, verify=VERIFY_SSL, timeout=10)
             resp.raise_for_status()
@@ -402,7 +402,7 @@ def background_fetch():
 
 @app.route("/api/last-winners")
 def last_winners():
-    winners_url = "https://cbet.gg/casinogo/widgets/last-winners"
+    winners_url = "https://cgg.bet.br/casinogo/widgets/last-winners"
     winners_headers = headers.copy()
     winners_headers["accept"] = "application/json"
 

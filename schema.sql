@@ -5,6 +5,6 @@ CREATE TABLE IF NOT EXISTS rtp_history (
     rtp REAL,
     extra BIGINT,
     rtp_status TEXT,
-    casa TEXT DEFAULT 'cbet',
+    casa TEXT DEFAULT 'cgg',
     timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
