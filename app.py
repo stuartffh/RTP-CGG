@@ -30,7 +30,7 @@ VERIFY_SSL = os.environ.get("VERIFY_SSL", "true").lower() not in (
     "0",
     "no",
 )
-REQUEST_TIMEOUT = 10
+REQUEST_TIMEOUT = 5
 
 url = "https://cgg.bet.br/casinogo/widgets/v2/live-rtp"
 search_url = "https://cgg.bet.br/casinogo/widgets/v2/live-rtp/search"
