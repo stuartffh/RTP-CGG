@@ -12,6 +12,7 @@ from google.protobuf import message_factory
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
 from google.protobuf.descriptor_pool import DescriptorPool
 from google.protobuf.json_format import MessageToDict
+from google.protobuf.message import DecodeError
 
 import db
 
@@ -128,6 +129,7 @@ def has_changes(novos, antigos):
 
 
 def fetch_games_data():
+    global latest_games
     if DEBUG_REQUESTS:
         print("\n[DEBUG] >>> Enviando Requisição <<<")
         print(f"[DEBUG] URL: {url}")
@@ -135,37 +137,46 @@ def fetch_games_data():
         print(f"[DEBUG] Data (bytes): {data}")
         print(f"[DEBUG] SSL Verify: {VERIFY_SSL}")
 
-    response = requests.post(
-        url, headers=headers, data=data, verify=VERIFY_SSL, timeout=REQUEST_TIMEOUT
-    )
+    try:
+        response = requests.post(
+            url, headers=headers, data=data, verify=VERIFY_SSL, timeout=REQUEST_TIMEOUT
+        )
+        response.raise_for_status()
 
-    if DEBUG_REQUESTS:
-        print("\n[DEBUG] >>> Enviando Requisição Semanal <<<")
-        print(f"[DEBUG] Data Semanal (bytes): {data_weekly}")
+        if DEBUG_REQUESTS:
+            print("\n[DEBUG] >>> Enviando Requisição Semanal <<<")
+            print(f"[DEBUG] Data Semanal (bytes): {data_weekly}")
 
-    response_weekly = requests.post(
-        url,
-        headers=headers,
-        data=data_weekly,
-        verify=VERIFY_SSL,
-        timeout=REQUEST_TIMEOUT,
-    )
+        response_weekly = requests.post(
+            url,
+            headers=headers,
+            data=data_weekly,
+            verify=VERIFY_SSL,
+            timeout=REQUEST_TIMEOUT,
+        )
+        response_weekly.raise_for_status()
 
-    if DEBUG_REQUESTS:
-        print("\n[DEBUG] <<< Recebendo Resposta >>>")
-        print(f"[DEBUG] Status Code: {response.status_code}")
-        print(f"[DEBUG] Response Content (raw bytes): {response.content}\n")
-        print("\n[DEBUG] <<< Recebendo Resposta Semanal >>>")
-        print(f"[DEBUG] Status Code: {response_weekly.status_code}")
-        print(f"[DEBUG] Response Content (raw bytes): {response_weekly.content}\n")
+        if DEBUG_REQUESTS:
+            print("\n[DEBUG] <<< Recebendo Resposta >>>")
+            print(f"[DEBUG] Status Code: {response.status_code}")
+            print(f"[DEBUG] Response Content (raw bytes): {response.content}\n")
+            print("\n[DEBUG] <<< Recebendo Resposta Semanal >>>")
+            print(f"[DEBUG] Status Code: {response_weekly.status_code}")
+            print(f"[DEBUG] Response Content (raw bytes): {response_weekly.content}\n")
 
-    decoded_message = ProtobufMessage()
-    decoded_message.ParseFromString(response.content)
-    games = MessageToDict(decoded_message).get("games", [])
+        decoded_message = ProtobufMessage()
+        decoded_message.ParseFromString(response.content)
+        games = MessageToDict(decoded_message).get("games", [])
 
-    decoded_weekly = ProtobufMessage()
-    decoded_weekly.ParseFromString(response_weekly.content)
-    games_weekly = MessageToDict(decoded_weekly).get("games", [])
+        decoded_weekly = ProtobufMessage()
+        decoded_weekly.ParseFromString(response_weekly.content)
+        games_weekly = MessageToDict(decoded_weekly).get("games", [])
+    except (requests.RequestException, DecodeError) as exc:
+        if DEBUG_REQUESTS:
+            print("[DEBUG] Erro ao processar dados de jogos")
+            print(exc)
+        return latest_games if latest_games else []
+
     week_map = {g["id"]: g for g in games_weekly}
 
     for game in games:
@@ -396,6 +407,10 @@ def background_fetch():
                 latest_games = novos
                 db.insert_games(latest_games)
                 socketio.emit("games_update", latest_games)
+        except Exception as exc:  # pragma: no cover - log para diagnostico
+            if DEBUG_REQUESTS:
+                print("[DEBUG] Erro ao atualizar jogos")
+                print(exc)
         finally:
             socketio.sleep(RTP_UPDATE_INTERVAL)
 
