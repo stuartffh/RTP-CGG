@@ -181,6 +181,8 @@ def history_records(
     end: str | None = None,
     game_id: str | None = None,
     name: str | None = None,
+    provider: str | None = None,
+    extra: str | None = None,
     casa: str = "cbet",
 ):
     """Retorna registros filtrados da tabela rtp_history."""
@@ -198,6 +200,12 @@ def history_records(
     if name:
         where.append("lower(name) LIKE %s")
         params.append(f"%{name.lower()}%")
+    if provider:
+        where.append("lower(provider) LIKE %s")
+        params.append(f"%{provider.lower()}%")
+    if extra:
+        where.append("CAST(extra AS TEXT) LIKE %s")
+        params.append(f"%{extra}%")
     where_sql = f"WHERE {' AND '.join(where)}" if where else ""
     query = f"""
         SELECT game_id, name, provider, rtp, extra, rtp_status, timestamp
