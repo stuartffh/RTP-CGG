@@ -184,6 +184,8 @@ def history_records(
     end: str | None = None,
     game_id: str | None = None,
     name: str | None = None,
+    provider: str | None = None,
+    extra: str | None = None,
     casa: str = "cgg",
 ):
     """Retorna registros filtrados da tabela rtp_history."""
