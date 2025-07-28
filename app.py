@@ -323,7 +323,9 @@ def api_history_records():
     end = request.args.get("end")
     gid = request.args.get("game_id")
     name = request.args.get("name")
-    return jsonify(db.history_records(start, end, gid, name))
+    provider = request.args.get("provider")
+    extra = request.args.get("extra")
+    return jsonify(db.history_records(start, end, gid, name, provider, extra))
 
 
 @app.route("/api/registro-extra")
