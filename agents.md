@@ -14,16 +14,14 @@ Consulte o arquivo `agents.md` para detalhes sobre os agentes da aplicação. At
 - Ao iniciar, este agente verifica se a coluna `rtp_status` existe e a cria automaticamente caso necessário.
 - `REQUEST_TIMEOUT` define o timeout das requisições RTP.
 - `WINNERS_TIMEOUT` controla o tempo limite do endpoint de vencedores.
-- `RTP_UPDATE_INTERVAL` ajusta a pausa entre atualizações automáticas. Esse
-  valor também define o intervalo padrão de envio de atualizações pelo
-  websocket.
+- `RTP_UPDATE_INTERVAL` ajusta a pausa entre atualizações automáticas.
 
 
 ## Funções e Comportamentos
 
 - `GET /api/games` – retorna jogos consultando `/live-rtp`.
 - `GET /api/melhores` – prioriza jogos por desempenho.
-- `POST /api/search-rtp` – pesquisa jogos enviando ao endpoint `/live-rtp/search` do site cgg.bet.br e, caso falhe, filtra a lista localmente. Utiliza headers `accept`, `content-type`, `x-language-iso`, `origin` e `referer`. A requisição respeita a variável `VERIFY_SSL` para definir se o certificado TLS será verificado.
+- `POST /api/search-rtp` – pesquisa jogos enviando ao endpoint `/live-rtp/search` do site cbet.gg.br e, caso falhe, filtra a lista localmente. Utiliza headers `accept`, `content-type`, `x-language-iso`, `origin` e `referer`. A requisição respeita a variável `VERIFY_SSL` para definir se o certificado TLS será verificado.
 - `GET /api/last-winners` – obtém os últimos vencedores do cassino.
 - `GET /api/history` – recupera registros da tabela `rtp_history` no banco definido em `DATABASE_URL`.
 - A tela de busca utiliza `/api/search-rtp` diretamente, atualizando os dados após a pesquisa e tentando novamente após alguns segundos quando necessário.

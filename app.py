@@ -1,12 +1,10 @@
 import os
 import urllib3
-from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
 from flask import send_file, abort
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-load_dotenv()
 import requests
 from google.protobuf import message_factory
 from google.protobuf.descriptor_pb2 import FileDescriptorProto
