@@ -5,7 +5,7 @@ from psycopg2.extras import RealDictCursor
 
 DB_DSN = os.environ.get(
     "DATABASE_URL",
-    "postgres://postgres:2412055Aa@185.44.66.206:5432/vigilancia?sslmode=disable",
+    "postgres://postgres:2412055Aa@54.207.60.178:5432/vigilancia?sslmode=disable",
 )
 
 
