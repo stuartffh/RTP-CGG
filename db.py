@@ -7,7 +7,7 @@ load_dotenv()
 
 DB_DSN = os.environ.get(
     "DATABASE_URL",
-    "postgres://postgres:2412055Aa@54.207.60.178:5432/vigilancia?sslmode=disable",
+    "postgres://postgres:2412055aa@54.207.60.178:5432/vigilancia?sslmode=disable",
 )
 
 
