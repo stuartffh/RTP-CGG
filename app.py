@@ -13,6 +13,8 @@ from google.protobuf.json_format import MessageToDict
 from google.protobuf.message import DecodeError
 
 import db
+from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
