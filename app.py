@@ -266,6 +266,11 @@ def search_local(names: list[str]):
 
 @app.route("/")
 def index():
+    # Se o build do React existir, usa-o como frontend padrão
+    react_index = os.path.join(REACT_BUILD_DIR, "index.html")
+    if os.path.isfile(react_index):
+        return send_file(react_index)
+    # fallback para a interface Jinja clássica
     return render_template("index.html")
 
 
