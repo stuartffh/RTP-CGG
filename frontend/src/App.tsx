@@ -13,7 +13,13 @@ export default function App() {
   useEffect(() => {
     let active = true
     fetchGames().then(d => active && setGames(d))
-    const s: Socket = io('/')
+    const s: Socket = io('/', {
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      transports: ['websocket']
+    })
     s.on('games_update', (d: Game[]) => setGames(d))
     return () => { active = false; s.disconnect() }
   }, [])
@@ -32,6 +38,17 @@ export default function App() {
     if (sort === 'name') list.sort((a,b) => a.name.localeCompare(b.name))
     return list
   }, [games, query, provider, sort])
+
+  const statusCounts = useMemo(() => {
+    let up = 0, down = 0, neutral = 0
+    for (const g of filtered) {
+      const st = g.rtp_status ?? (g.extra == null ? 'neutral' : (g.extra < 0 ? 'down' : 'up'))
+      if (st === 'up') up++
+      else if (st === 'down') down++
+      else neutral++
+    }
+    return { up, down, neutral, total: filtered.length }
+  }, [filtered])
 
   return (
     <div style={{ padding: 16 }}>
@@ -54,6 +71,12 @@ export default function App() {
         <select value={provider} onChange={e => setProvider(e.target.value)} className="form-select" style={{ height: 36, background: '#0f1424', color: '#e6e6e6', border: '1px solid rgba(255,255,255,.06)' }}>
           {providers.map(p => <option key={p} value={p}>{p === 'all' ? 'Todos os provedores' : p}</option>)}
         </select>
+        <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 12, fontSize: '.9rem', opacity: .9 }}>
+          <span>Total: {statusCounts.total}</span>
+          <span className="rtp-positive">Positivos: {statusCounts.up}</span>
+          <span className="rtp-negative">Negativos: {statusCounts.down}</span>
+          <span>Neutros: {statusCounts.neutral}</span>
+        </div>
       </div>
 
       <div className="sw-grid">

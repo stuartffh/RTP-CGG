@@ -71,13 +71,17 @@ h1, h2, h3, h4, h5, h6 { font-family: 'Orbitron', sans-serif; text-transform: up
 
 .rtp-badge { font-family: 'Orbitron', sans-serif; font-size: 0.72rem; padding: 2px 6px; border-radius: 6px; }
 
+/* Cores de RTP (números) */
+.rtp-positive { color: var(--sw-green); text-shadow: 0 0 8px rgba(0, 208, 132, .25); }
+.rtp-negative { color: var(--sw-red); text-shadow: 0 0 8px rgba(255, 59, 59, .25); }
+
 /* Links */
 a { color: var(--sw-blue); }
 a:hover { color: var(--sw-yellow); }
 
 /* Utility */
 .sw-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0 12px; }
-.sw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.sw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
 
 /* Cards e imagens menores por padrão */
 .card { border-radius: 8px; }

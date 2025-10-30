@@ -6,7 +6,9 @@ const IMAGE_ENDPOINT = '/imagens'
 export function GameCard({ game, onOpen }: { game: Game; onOpen: (id: number) => void }) {
   const rtpDia = (game.rtp / 100).toFixed(2)
   const semana = game.rtp_semana != null ? (game.rtp_semana / 100).toFixed(2) : '--'
-  const rtpStatus = game.rtp_status || 'neutral'
+  const statusDia = game.rtp_status ?? (game.extra == null ? 'neutral' : (game.extra < 0 ? 'down' : 'up'))
+  const statusSemana = game.status_semana ?? (game.extra_semana == null ? 'neutral' : (game.extra_semana < 0 ? 'down' : 'up'))
+  const rtpStatus = statusDia || 'neutral'
 
   const badge = (status?: string, label = '') => {
     const cls = status === 'up' ? 'bg-success' : status === 'down' ? 'bg-danger' : 'bg-secondary'
@@ -30,12 +32,16 @@ export function GameCard({ game, onOpen }: { game: Game; onOpen: (id: number) =>
           {typeof game.extra === 'number' && <p className="mb-1 unidades">Unidades: {game.extra}</p>}
           <div className="rtp-container">
             <div>
-              <strong>{rtpDia}%</strong>
-              <div>{badge(game.rtp_status, 'Dia')}</div>
+              <strong className={statusDia === 'down' ? 'rtp-negative' : statusDia === 'up' ? 'rtp-positive' : undefined}>
+                {rtpDia}%
+              </strong>
+              <div>{badge(statusDia, 'Dia')}</div>
             </div>
             <div>
-              <strong>{semana}%</strong>
-              <div>{badge(game.status_semana, 'Semana')}</div>
+              <strong className={statusSemana === 'down' ? 'rtp-negative' : statusSemana === 'up' ? 'rtp-positive' : undefined}>
+                {semana}%
+              </strong>
+              <div>{badge(statusSemana, 'Semana')}</div>
             </div>
           </div>
         </div>

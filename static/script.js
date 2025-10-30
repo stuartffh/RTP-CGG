@@ -467,6 +467,8 @@ function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
     const dailyDiv = document.createElement('div');
     const dailyStrong = document.createElement('strong');
     dailyStrong.textContent = `${(game.rtp / 100).toFixed(2)}%`;
+    if (rtpStatus === 'down') dailyStrong.classList.add('rtp-negative');
+    else if (rtpStatus === 'up') dailyStrong.classList.add('rtp-positive');
     const dailyBadgeDiv = document.createElement('div');
     dailyBadgeDiv.innerHTML = dailyBadge;
     dailyDiv.appendChild(dailyStrong);
@@ -477,6 +479,8 @@ function createGameCard(game, imgUrl, dailyBadge, weeklyBadge, rtpStatus) {
     const weeklyValue = game.rtp_semana ?? null;
     weeklyStrong.textContent =
         weeklyValue !== null ? `${(weeklyValue / 100).toFixed(2)}%` : '--';
+    if (game.status_semana === 'down') weeklyStrong.classList.add('rtp-negative');
+    else if (game.status_semana === 'up') weeklyStrong.classList.add('rtp-positive');
     const weeklyBadgeDiv = document.createElement('div');
     weeklyBadgeDiv.innerHTML = weeklyBadge;
     weeklyDiv.appendChild(weeklyStrong);
@@ -569,12 +573,18 @@ function displayGames(games) {
                         ? `Unidades: ${game.extra}`
                         : '';
             dailyStrong.textContent = `${(game.rtp / 100).toFixed(2)}%`;
+            dailyStrong.classList.remove('rtp-positive','rtp-negative');
+            if (rtpStatus === 'down') dailyStrong.classList.add('rtp-negative');
+            else if (rtpStatus === 'up') dailyStrong.classList.add('rtp-positive');
             dailyBadgeDiv.innerHTML = dailyBadge;
             const weeklyValue = game.rtp_semana ?? null;
             weeklyStrong.textContent =
                 weeklyValue !== null
                     ? `${(weeklyValue / 100).toFixed(2)}%`
                     : '--';
+            weeklyStrong.classList.remove('rtp-positive','rtp-negative');
+            if (weeklyStatus === 'down') weeklyStrong.classList.add('rtp-negative');
+            else if (weeklyStatus === 'up') weeklyStrong.classList.add('rtp-positive');
             weeklyBadgeDiv.innerHTML = weeklyBadge;
         }
 
