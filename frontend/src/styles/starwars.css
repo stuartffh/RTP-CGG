@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Pathway+Gothic+One&display=swap');
+
+:root {
+  --sw-bg-1: #05060a;
+  --sw-bg-2: #0a0d17;
+  --sw-text: #e6e6e6;
+  --sw-muted: #9aa3b2;
+  --sw-yellow: #ffe81f;
+  --sw-blue: #00bcd4;
+  --sw-red: #ff3b3b;
+  --sw-green: #00d084;
+}
+
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  color: var(--sw-text);
+  background: radial-gradient(1200px 800px at 20% -10%, var(--sw-bg-2), var(--sw-bg-1));
+  font-family: 'Pathway Gothic One', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  letter-spacing: 0.4px;
+}
+
+/* Star field */
+body::before, body::after {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,.7) 40%, transparent 41%),
+    radial-gradient(1px 1px at 80% 70%, rgba(255,255,255,.6) 40%, transparent 41%),
+    radial-gradient(1px 1px at 60% 20%, rgba(255,255,255,.5) 40%, transparent 41%),
+    radial-gradient(2px 2px at 40% 80%, rgba(255,255,255,.7) 40%, transparent 41%);
+  opacity: .25;
+}
+
+h1, h2, h3, h4, h5, h6 { font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
+.sw-title { color: var(--sw-yellow); text-shadow: 0 0 12px rgba(255,232,31,.35), 0 0 24px rgba(255,232,31,.15); }
+
+/* Panels and cards with subtle neon borders */
+.sw-panel {
+  background: linear-gradient(180deg, rgba(20,24,40,.9), rgba(10,12,22,.95));
+  border: 1px solid rgba(255,232,31,.12);
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.02);
+}
+
+.sw-btn {
+  font-family: 'Orbitron', sans-serif;
+  border-radius: 10px;
+  padding: 10px 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid rgba(255,232,31,.3);
+  background: linear-gradient(180deg, rgba(255,232,31,.9), rgba(255,217,0,.85));
+  color: #0a0a0a;
+  box-shadow: 0 8px 24px rgba(255,232,31,.22);
+}
+.sw-btn:active { transform: translateY(1px); }
+
+.sw-badge { background: rgba(255,232,31,.15); border: 1px solid rgba(255,232,31,.32); color: var(--sw-yellow); }
+
+/* Game card accents based on status */
+.game-card[data-status="up"] { border-left: 4px solid var(--sw-green); }
+.game-card[data-status="down"] { border-left: 4px solid var(--sw-red); }
+.game-card[data-status="neutral"] { border-left: 4px solid var(--sw-yellow); }
+
+.card { background: linear-gradient(180deg, rgba(18,22,36,.96), rgba(10,12,22,.96)); border: 1px solid rgba(255,255,255,.06); }
+.card-title { color: #fff; }
+.card-title:hover { color: var(--sw-yellow); text-shadow: 0 0 10px rgba(255,232,31,.35); }
+
+.rtp-badge { font-family: 'Orbitron', sans-serif; }
+
+/* Links */
+a { color: var(--sw-blue); }
+a:hover { color: var(--sw-yellow); }
+
+/* Utility */
+.sw-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 0 16px; }
+.sw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+

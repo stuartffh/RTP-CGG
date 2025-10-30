@@ -2,6 +2,8 @@
 
 Aplicação Flask que consulta o endpoint `https://cgg.bet.br` e exibe em tempo real o RTP (Return to Player) dos jogos de cassino.
 
+> Frontend React opcional: existe um projeto React em `frontend/` (Vite + React + TS). O build é servido pelo Flask na mesma porta, sob `/app`.
+
 ## Pré-requisitos
 
 - **Python** 3.12 ou superior com `pip` instalado.
@@ -24,6 +26,14 @@ Aplicação Flask que consulta o endpoint `https://cgg.bet.br` e exibe em tempo 
    Não utilize `flask run`, pois o websocket requer que o servidor do
    `Flask-SocketIO` seja iniciado. O serviço ficará disponível em
    `http://localhost:5000`.
+
+3. (Opcional) Gerar build do frontend React e servir em `/app`:
+   ```bash
+   cd frontend
+   npm install  # ou pnpm install / yarn
+   npm run build
+   # volte para a raiz e rode o Flask (já servirá /app)
+   ```
 
 ### Utilizando Docker
 
