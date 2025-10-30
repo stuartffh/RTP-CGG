@@ -18,18 +18,20 @@
   --text-secondary: #888;
   --border-glow: rgba(0, 255, 136, 0.3);
   --shadow-glow: rgba(0, 255, 136, 0.4);
+  --base-font-size: 14px;
+  --card-padding: 0.75rem;
+  --card-title-font: 1rem;
+  --card-badge-font: 0.78em;
+  --container-padding: 8px;
+  --input-padding: 0.55rem;
 }
 
 body {
-  padding: 20px;
-  background: linear-gradient(135deg, var(--bg-dark-1) 0%, var(--bg-dark-2) 50%, var(--bg-dark-3) 100%);
-  background-attachment: fixed;
   color: var(--text-primary);
   font-family: "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-size: 14px;
   min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
-  line-height: 1.6;
+  background: linear-gradient(135deg, var(--bg-dark-1) 0%, var(--bg-dark-2) 50%, var(--bg-dark-3) 100%);
 }
 
 /* Estilos globais para todos os elementos */
@@ -37,7 +39,9 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
   text-shadow: 0 0 10px var(--shadow-glow);
   font-weight: 600;
-  margin-bottom: 1rem;
+  font-size: 1.07em;
+  margin-bottom: 0.3rem;
+  line-height: 1.15;
 }
 
 p {
@@ -70,10 +74,14 @@ code {
 .container {
   position: relative;
   z-index: 1;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
 }
 
 .row {
   margin: 0;
+  width: 100vw;
+  max-width: 100vw;
   display: flex;
   flex-wrap: wrap;
 }
@@ -88,8 +96,9 @@ textarea {
   color: var(--text-primary);
   border: 1px solid var(--border-glow);
   border-radius: 8px;
-  padding: 0.75rem;
+  padding: var(--input-padding) !important;
   transition: all 0.3s ease;
+  font-size: 0.97rem;
 }
 
 input[type="text"]:focus,
@@ -185,12 +194,11 @@ body::before {
 
 /* Container principal centralizado - globalizado */
 .container-fluid {
-  max-width: 1600px;
+  width: 100vw;
+  max-width: 100vw;
   margin: 0 auto;
   position: relative;
   z-index: 1;
-  padding-left: 15px;
-  padding-right: 15px;
 }
 
 .container {
@@ -205,12 +213,15 @@ body::before {
   position: sticky;
   top: 20px;
   height: fit-content;
+  max-width: 100%;
+  min-width: 120px;
+  gap: 0.35rem;
 }
 
 .sidebar .controls {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.23rem;
   background: linear-gradient(135deg, rgba(22, 33, 62, 0.95) 0%, rgba(26, 26, 46, 0.95) 100%);
   border: 1px solid rgba(0, 255, 136, 0.2);
   border-radius: 12px;
@@ -220,6 +231,7 @@ body::before {
     0 0 20px rgba(0, 255, 136, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
+  padding: 1rem 0.8rem;
 }
 
 .sidebar .controls input,
@@ -249,6 +261,9 @@ body::before {
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  font-size: 0.91rem;
+  height: 1.9em;
+  min-height: 1.5em;
 }
 
 .sidebar .btn::before {
@@ -270,14 +285,14 @@ body::before {
 #games-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.2rem;
+  gap: 0.8rem;
 }
 
 /* Card container */
 .game-card {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-left: 4px solid transparent;
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
   position: relative;
 }
@@ -327,7 +342,7 @@ body::before {
 /* Card interno */
 .card {
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   background: linear-gradient(135deg, rgba(22, 22, 22, 0.95) 0%, rgba(26, 26, 46, 0.95) 100%);
   box-shadow: 
     0 4px 20px rgba(0, 0, 0, 0.4),
@@ -337,6 +352,7 @@ body::before {
   border: 1px solid rgba(0, 255, 136, 0.1);
   position: relative;
   overflow: hidden;
+  padding: var(--card-padding);
 }
 
 .card::after {
@@ -368,7 +384,7 @@ body::before {
 /* Título do jogo */
 .card-title {
   cursor: pointer;
-  font-size: 1.1rem;
+  font-size: var(--card-title-font);
   font-weight: 600;
   color: #ffffff;
   text-shadow: 
@@ -379,6 +395,8 @@ body::before {
   text-overflow: ellipsis;
   transition: all 0.3s ease;
   position: relative;
+  margin-bottom: 0.5rem;
+  padding: 0.1em 0.1em;
 }
 
 .card-title:hover {
@@ -391,14 +409,15 @@ body::before {
 
 /* Badge RTP */
 .rtp-badge {
-  font-size: 0.85em;
-  padding: 0.15em 0.4em;
-  border-radius: 6px;
+  font-size: var(--card-badge-font);
+  padding: 0.1em 0.3em;
+  border-radius: 4px;
   background: rgba(34, 34, 34, 0.8);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   transition: all 0.3s ease;
+  margin-bottom: 0.01em;
 }
 
 .rtp-badge:hover {
@@ -411,7 +430,7 @@ body::before {
   display: flex;
   justify-content: space-between;
   margin-top: 0.5rem;
-  gap: 0.5rem;
+  gap: 0.22rem;
 }
 
 .rtp-container div {
@@ -424,7 +443,7 @@ body::before {
   height: auto;
   object-fit: contain;
   display: block;
-  max-height: 180px;
+  max-height: 130px;
   border-radius: 8px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   filter: brightness(0.9) contrast(1.1);
@@ -444,8 +463,8 @@ body::before {
   transform: translateX(50%);
   background: linear-gradient(135deg, rgba(0, 255, 150, 0.95) 0%, rgba(0, 255, 136, 0.95) 100%);
   color: #000;
-  padding: 12px 24px;
-  border-radius: 8px;
+  padding: 8px 13px;
+  border-radius: 5px;
   opacity: 0;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
@@ -611,7 +630,7 @@ body::before {
 
 /* Números RTP */
 .card-text strong {
-  font-size: 1.4rem;
+  font-size: 1.08rem;
   font-weight: 700;
   transition: all 0.3s ease;
   display: inline-block;
@@ -636,6 +655,7 @@ body::before {
     0 0 40px rgba(0, 255, 136, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
+  max-height: 90vh;
 }
 
 .modal-header {
@@ -661,9 +681,13 @@ body::before {
 
 /* Centralização de conteúdo principal */
 main {
+  width: 100%;
+  max-width: 100vw;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0.1rem 0.1rem;
 }
 
 #games-container {
@@ -691,7 +715,8 @@ main {
   color: #00ff88;
   text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
   font-weight: 600;
-  padding: 1rem;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.96em;
 }
 
 .table-dark td {
@@ -801,6 +826,8 @@ main {
   border: 1px solid rgba(0, 255, 136, 0.2);
   color: #e0e0e0;
   transition: all 0.3s ease;
+  padding: 0.23em 0.55em;
+  font-size: 0.93em;
 }
 
 .list-group-item:hover {
@@ -917,36 +944,168 @@ canvas {
 }
 
 /* Responsividade melhorada */
-@media (max-width: 768px) {
-  body {
-    padding: 10px;
+@media (max-width: 1200px) {
+  .container-fluid, .container {
+    max-width: 98vw;
   }
-
-  .container-fluid {
-    max-width: 100%;
-    padding: 10px;
-  }
-  
-  .container {
-    max-width: 100%;
-    padding: 10px;
-  }
-  
-  .sidebar {
-    position: relative;
-    top: 0;
-    margin-bottom: 2rem;
-  }
-  
   #games-container {
-    max-width: 100%;
+    gap: 0.7rem;
   }
+}
 
+@media (max-width: 900px) {
+  main {
+    padding: 0.05rem 0.01rem;
+  }
+  .container-fluid, .container {
+    margin-bottom: 0.2rem;
+  }
+  .card-title {
+    font-size: 0.97rem;
+  }
   .sidebar .controls {
-    padding: 1rem;
+    padding: 0.4rem 0.6rem;
   }
+  .card {
+    padding: 0.6rem;
+  }
+}
 
-  h1, h2, h3, h4, h5, h6 {
-    font-size: calc(1em + 0.5vw);
+@media (max-width: 600px) {
+  main, .container-fluid {
+    width: 100vw;
+    max-width: 100vw;
+    min-width: 0;
   }
+  .container-fluid, .container {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+  .sidebar {
+    margin-bottom: 0.6rem;
+    min-width: 110px;
+  }
+  #games-container {
+    gap: 0.5rem;
+  }
+  .game-img {
+    max-height: 90px;
+  }
+  .card-title {
+    font-size: 0.94rem;
+  }
+  .sidebar .controls {
+    padding: 0.13rem 0.08rem;
+  }
+  .card {
+    padding: 0.2rem;
+  }
+  body, .container-fluid, .container, main {
+    overflow-x: auto;
+  }
+  .card-body {
+    padding: 0.12em 0.13em;
+  }
+  .modal-content {
+    max-height: 95vh;
+  }
+}
+
+#games-container {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  max-width: 100vw;
+}
+
+.card {
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 400px) {
+  .table-responsive, .container-fluid, .container, main, .row, .card, .game-card {
+    max-width: 100vw;
+    overflow-x: auto;
+  }
+  .sidebar {
+    min-width: 80px;
+  }
+  .sidebar .btn {
+    font-size: 0.83rem;
+    height: 1.6em;
+    min-height: 1.1em;
+  }
+  .sidebar .controls {
+    padding: 0.04rem 0.04rem;
+  }
+}
+
+.btn, .btn-success, .btn-info, .btn-warning, .btn-primary, .btn-secondary {
+  padding: 0.35em 0.7em;
+  font-size: 0.97rem;
+  height: 2.3em;
+  min-height: 2em;
+}
+
+.sidebar .btn {
+  padding: 0.3em 0.6em;
+  font-size: 0.92rem;
+  height: 2em;
+}
+
+#search-input, .form-control, .form-select {
+  font-size: 0.95rem;
+  padding: 0.45em 0.62em !important;
+  min-height: 2.1em;
+  height: 2.15em;
+  border-radius: 8px;
+}
+
+.sidebar .form-control, .sidebar .form-select {
+  font-size: 0.91rem;
+  padding: 0.3em 0.55em !important;
+  height: 1.9em;
+  min-height: 1.7em;
+}
+
+.sidebar .form-control.mb-2, .sidebar .form-select.mb-2 {
+  margin-bottom: 0.35rem !important;
+}
+
+.game-card, .card {
+  border-radius: 7px;
+  border-width: 1px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+
+.card {
+  border-radius: 6px;
+}
+
+.rtp-badge, .badge, .unidades {
+  font-size: 0.8em !important;
+  padding: 0.08em 0.18em;
+}
+
+.card-text, .unidades, .mb-1 {
+  font-size: 0.90em;
+  margin-bottom: 0.13rem;
+}
+
+.table, .table-dark, .table-dark-striped {
+  margin-bottom: 0.4rem;
+  font-size: 0.97em;
+}
+
+.table th, .table td {
+  padding: 0.3em 0.6em;
+  font-size: 0.93em;
+}
+
+.card, .game-card {
+  background: linear-gradient(135deg, rgba(32, 32, 48, .93) 0%, rgba(28, 28, 44, 0.93) 100%);
+}
+
+.card {
+  border-color: rgba(80,255,180,0.04);
 }
