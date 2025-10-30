@@ -17,7 +17,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 # Copia o build do React para static/react, servido pelo Flask em /app
-COPY --from=frontend /app/frontend/dist /app/static/react
+COPY --from=frontend /app/static/react /app/static/react
 EXPOSE 5000
 
 CMD ["gunicorn", "-k", "eventlet", "-b", "0.0.0.0:5000", "wsgi:app"]
