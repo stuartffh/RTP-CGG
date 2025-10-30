@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Pathway+Gothic+One&display=swap');
+
+:root {
+  --sw-yellow: #ffe81f;
+  --sw-blue: #00bcd4;
+  --sw-bg-1: #05060a;
+  --sw-bg-2: #0a0d17;
+}
+
+html, body { height: 100%; }
+body {
+  background: radial-gradient(1200px 800px at 20% -10%, var(--sw-bg-2), var(--sw-bg-1));
+  font-family: 'Pathway Gothic One', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+body::before, body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,.7) 40%, transparent 41%),
+    radial-gradient(1px 1px at 80% 70%, rgba(255,255,255,.6) 40%, transparent 41%),
+    radial-gradient(1px 1px at 60% 20%, rgba(255,255,255,.5) 40%, transparent 41%),
+    radial-gradient(2px 2px at 40% 80%, rgba(255,255,255,.7) 40%, transparent 41%);
+  opacity: .2;
+}
+
+h1, h2, h3, h4, h5, h6 { font-family: 'Orbitron', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+.sw-title { color: var(--sw-yellow); text-shadow: 0 0 12px rgba(255,232,31,.35); }
+
+/* Painéis e tabelas */
+.bg-dark, .table-dark { border-color: rgba(255,232,31,.15) !important; }
+.table-dark thead { border-bottom-color: rgba(255,232,31,.25); }
+.table-dark th { color: var(--sw-yellow); }
+
+/* Inputs compactos */
+.form-control, .form-select { height: 34px; padding: 4px 10px; font-size: .95rem; }
+.btn { border-radius: 8px; padding: 7px 12px; font-family: 'Orbitron', sans-serif; text-transform: uppercase; font-size: .9rem; }
+
+/* Cards de jogo menores (páginas clássicas) */
+#games-container { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important; gap: 10px !important; }
+.game-img { max-height: 110px !important; }
+.card-title { font-size: .95rem !important; margin-bottom: .4rem !important; }
+.rtp-badge { font-size: .75rem !important; padding: 2px 6px !important; }
+
+@media (max-width: 768px) {
+  #games-container { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important; gap: 8px !important; }
+  .game-img { max-height: 90px !important; }
+}
+
+@media (max-width: 480px) {
+  #games-container { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; }
+  .game-img { max-height: 80px !important; }
+}
+
