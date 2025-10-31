@@ -2,7 +2,7 @@ import os
 import urllib3
 from flask import Flask, jsonify, render_template, request
 from flask_socketio import SocketIO, emit
-from flask import send_file, abort, send_from_directory
+from flask import send_file, abort
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import requests
@@ -56,9 +56,6 @@ data_weekly = b"\x08\x02\x10\x02"
 
 IMAGE_CACHE_DIR = "image_cache"
 os.makedirs(IMAGE_CACHE_DIR, exist_ok=True)
-
-# Diretório do build do React (opcional). O build será gerado em static/react
-REACT_BUILD_DIR = os.path.join(app.root_path, "static", "react")
 
 
 def get_protobuf_message():
@@ -266,11 +263,6 @@ def search_local(names: list[str]):
 
 @app.route("/")
 def index():
-    # Se o build do React existir, usa-o como frontend padrão
-    react_index = os.path.join(REACT_BUILD_DIR, "index.html")
-    if os.path.isfile(react_index):
-        return send_file(react_index)
-    # fallback para a interface Jinja clássica
     return render_template("index.html")
 
 
@@ -398,29 +390,6 @@ def cached_image(game_id):
     )
     response.headers["Cache-Control"] = "public, max-age=86400"
     return response
-
-
-# Servir frontend React (SPA) em /app se o build existir
-@app.route("/app/assets/<path:filename>")
-def serve_react_assets(filename):
-    assets_dir = os.path.join(REACT_BUILD_DIR, "assets")
-    if not os.path.isdir(assets_dir):
-        abort(404)
-    return send_from_directory(assets_dir, filename)
-
-
-@app.route("/app", defaults={"path": ""})
-@app.route("/app/<path:path>")
-def serve_react_app(path: str):
-    # Fallback do SPA: qualquer rota sob /app entrega o index.html do build
-    index_path = os.path.join(REACT_BUILD_DIR, "index.html")
-    if not os.path.isfile(index_path):
-        abort(404)
-    # Se for um arquivo existente dentro do build, serve-o diretamente
-    candidate = os.path.join(REACT_BUILD_DIR, path)
-    if path and os.path.isfile(candidate):
-        return send_from_directory(REACT_BUILD_DIR, path)
-    return send_file(index_path)
 
 
 @socketio.on("connect")
