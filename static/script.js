@@ -774,8 +774,46 @@ document.addEventListener('click', async (e) => {
         connectSocket();
     }
 
+    // Função para limpar backdrop e restaurar estado do body
+    function cleanupModal() {
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) backdrop.remove();
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    }
+
+    // Event listener para o modal de jogo
     document.getElementById('gameModal')?.addEventListener('hidden.bs.modal', () => {
         clearInterval(modalInterval);
         modalInterval = null;
         modalGameId = null;
+        cleanupModal();
+    });
+
+    // Event listener específico para o modal de vencedores
+    document.getElementById('winnersModal')?.addEventListener('hidden.bs.modal', () => {
+        clearInterval(winnersInterval);
+        winnersInterval = null;
+        const checkbox = document.getElementById('show-winners');
+        if (checkbox) checkbox.checked = false;
+        cleanupModal();
+    });
+
+    // Garantir que os botões de fechar funcionem corretamente
+    // Usar event delegation para garantir que funcione mesmo se os elementos forem criados dinamicamente
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-bs-dismiss="modal"]');
+        if (btn) {
+            const modalEl = btn.closest('.modal');
+            if (modalEl) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) {
+                    // Permitir que o Bootstrap processe primeiro, depois garantir limpeza
+                    setTimeout(() => {
+                        cleanupModal();
+                    }, 300);
+                }
+            }
+        }
     });
